@@ -1,0 +1,195 @@
+body {
+    font-family: "Noto Sans", sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: white;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4{
+  font-family: "Montserrat", sans-serif;
+}
+
+.navbar {
+  position: relative;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #deccae;
+  padding: 0 20px;
+  max-width: 100%; /* Limita el ancho al viewport */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow-x: hidden;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: black;
+  z-index: 2;
+  font-size: 18px;
+}
+
+.texto-volver {
+  display: inline;
+}
+
+.flecha-volver {
+  display: none;
+  font-size: 22px;
+  margin-right: 8px;
+}
+
+.logo-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 70px;
+  max-height: 70px;
+  transition: all 0.3s ease;
+}
+
+main {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+.pantalla-izquierda {
+  flex: 1;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+form {
+  max-width: 400px;
+  margin: auto;
+  background-color: #fdfaf6; /* Fondo similar al resumen */
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.formulario h4{
+  text-align: center;
+}
+
+.campo {
+  margin-bottom: 0.5rem;
+}
+
+.campo label { 
+  display: block; 
+  margin-bottom: 3px; 
+  font-weight: bold; 
+}
+    
+input, select {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-top: 0.3rem;
+}
+
+select {
+    width: 105%;
+}
+
+.fila-horizontal {
+  display: flex;
+  gap: 2rem;
+}
+
+.fila-horizontal .campo {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Asignación personalizada de tamaños */
+.fila-horizontal .campo:nth-child(1) { flex: 3; }  /* Calle */
+.fila-horizontal .campo:nth-child(2) { flex: 2; }  /* Altura */
+.fila-horizontal .campo:nth-child(3),
+.fila-horizontal .campo:nth-child(4) { flex: 1; }  /* Piso y Dpto */
+
+.error {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+.añadir-carrito-btn {
+    padding: 10px 14px;
+    background-color: #F0E9E1;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.pantalla-derecha {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.pantalla-derecha img {
+  max-width: 60%;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+/* ESTILOS RESPONSIVOS */
+@media (max-width: 768px) {
+/* NAVBAR */
+.texto-volver {
+    display: none;
+}
+
+.flecha-volver {
+    display: inline;
+}
+
+.flecha-volver img{
+    height: 20px;
+}
+
+.logo {
+    height: 60px; /* opcional, para evitar que se vea muy grande en móvil */
+}
+
+main {
+    flex-direction: column;
+}
+
+.pantalla-izquierda,
+.pantalla-derecha {
+    width: 100%;
+    padding: 1.5rem;
+}
+
+.pantalla-derecha {
+    margin-top: 2rem;
+  }
+
+.pantalla-derecha img {
+    max-width: 80%;
+    height: auto;
+}
+}

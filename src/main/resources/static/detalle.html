@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Arca Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="icon" href="./images/logo arca.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
+    <script defer src="detalle.js"></script>
+</head>
+<body>
+    <header>
+        <nav id="navbar" class="navbar">
+            <div class="navbar-left"><button class="menu-btn" onclick="toggleMenu()">☰</button></div>
+            
+            <div class="navbar-center"><a href="index.html" id="logo" onclick="mostrarTodos()"><img src="./images/logo arca.png" alt="Logo" class="logo"></a></div>
+        
+            <div class="navbar-right"><button class="cart-btn" onclick="openCarrito()"><img src="./images/shopping-bag.png" alt="carrito"></button></div>
+        </nav>
+
+        <div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+        <nav class="menu-lateral" id="menuLateral">
+            <button class="cerrar-menu" onclick="closeMenu()">✕</button>
+            
+            <div class="search-container">
+                <input type="text" placeholder="Buscar" class="search-input" id="search-input" autocomplete="off"/>
+                <button class="search-btn" onclick="searchProducts()">
+                    <svg viewBox="0 0 24 24" class="search-icon">
+                        <circle cx="11" cy="11" r="8" stroke="black" stroke-width="2" fill="none"/>
+                        <line x1="16" y1="16" x2="22" y2="22" stroke="black" stroke-width="2"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <ul>
+                <li><a href="index.html" onclick="mostrarTodos()">Inicio</a></li>
+                <li class="submenu-toggle">
+                    <a href="javascript:void(0)" onclick="toggleSubmenu()">Productos ▾</a>
+                    <ul class="submenu" id="submenuProductos">
+                        <li><a href="index.html?categoria=BAZAR">Bazar</a></li>
+                        <li><a href="index.html?categoria=BAÑO">Baño</a></li>
+                        <li><a href="index.html?categoria=DECORACIÓN">Decoración</a></li>
+                        <li><a href="index.html?categoria=TEXTIL">Textil</a></li>
+                        <li class="submenu-toggle">
+                            <a href="javascript:void(0)" onclick="toggleSubmenu2()">Muebles interior ▾</a>
+                            <ul class="submenu-muebles" id="submenuMuebles">
+                                <li><a href="index.html?categoria=INTERIOR">Todos</a></li>
+                                <li><a href="index.html?categoria=SILLONES">Sillones</a></li>
+                                <li><a href="index.html?categoria=BANQUETAS">Banquetas</a></li>
+                                <li><a href="index.html?categoria=SILLAS">Sillas</a></li>
+                                <li><a href="index.html?categoria=MESAS">Mesas</a></li>
+                                <li><a href="index.html?categoria=OFICINA">Oficina</a></li>
+                                <li><a href="index.html?categoria=MESAS RATONAS">Mesas ratonas</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#" onclick="filtrarProductos('MUEBLES EXTERIOR')">Muebles exterior</a></li>
+                    </ul>
+                </li>
+                <li><a href="#" onclick="openMenuInfo()">¿Quiénes somos?</a></li>
+                <li><a href="#" onclick="openMenuInstrucciones()">¿Cómo comprar?</a></li>
+                <li><a href="#footer" onclick="closeMenu()">Contacto</a></li>
+                <li><a href="#" onclick="openMenuPreguntas()">Preguntas Frecuentes</a></li>
+            </ul>
+        </nav>
+
+        <nav id="menuInstrucciones" class="menu-instrucciones">
+            <button class="cerrar-menu" onclick="closeMenuInstrucciones()">✕</button>
+            <h2 class="menu-title">¿Cómo comprar?</h2>
+            <p>
+                <strong>1.</strong> Explorá nuestra tienda y encontrá los productos que necesitás.<br><br>
+                <strong>2.</strong> Agregalos al carrito con la cantidad que desees.<br><br>
+                <strong>3.</strong> Cuando tengas todo listo, ingresá al carrito para revisar tu pedido.<br><br>
+                <strong>4.</strong> Elegí el método de entrega: retiro en sucursal o envío a domicilio con Andreani.<br><br>
+                <strong>5.</strong> Si seleccionás envío, ingresá tu código postal para calcular el costo.<br><br>
+                <strong>6.</strong> Completá el formulario con tus datos y te redireccionaremos al pago.<br><br>
+                <strong>7.</strong> ¡Listo! Procesamos tu pedido y nos pondremos en contacto en breve.<br><br>
+                <strong>Gracias por elegirnos. ¡Estamos para ayudarte! 💬</strong>
+            </p>
+        </nav>
+
+        <nav id="menuInfo" class="menu-info">
+            <button class="cerrar-menu" onclick="closeMenuInfo()">✕</button>
+            <h2 class="menu-title">¿Quiénes somos?</h2>
+            <p>
+                Somos una tienda dedicada a ofrecer productos cuidadosamente seleccionados para el hogar, el trabajo y la vida cotidiana.<br><br>
+                Nuestro compromiso es brindar una experiencia de compra clara, segura y personalizada.<br><br>
+                Trabajamos con proveedores de confianza y mantenemos altos estándares de calidad.<br><br>
+                Valoramos la atención al cliente y nos esforzamos por mejorar constantemente nuestros servicios.<br><br>
+                <strong>Gracias por elegirnos.</strong>
+            </p>
+        </nav>
+
+        <nav id="menuPreguntas" class="menu-preguntas">
+            <button class="cerrar-menu" onclick="closeMenuPreguntas()">✕</button>
+            <h2 class="menu-title">Preguntas frecuentes</h2>
+            <div class="preguntas">
+                <p><strong>1. ¿Cómo realizo una compra?</strong><br>
+                Seleccioná los productos que te interesan, agregalos al carrito y seguí los pasos del proceso de pago. Podés elegir retiro en sucursal o envío a domicilio.</p>
+
+                <p><strong>2. ¿Qué métodos de pago aceptan?</strong><br>
+                Aceptamos pagos con tarjeta de crédito/débito y transferencia bancaria.</p>
+
+                <p><strong>3. ¿Realizan envíos?</strong><br>
+                Sí, realizamos envíos a todo el país a través de Andreani. Podés calcular el costo ingresando tu código postal antes de finalizar la compra.</p>
+
+                <p><strong>4. ¿Puedo retirar mi pedido personalmente?</strong><br>
+                Sí, podés retirar sin costo desde nuestra sucursal una vez que tu pedido esté confirmado.</p>
+
+                <p><strong>5. ¿Cuánto tarda en llegar mi pedido?</strong><br>
+                Los plazos de entrega varían según la localidad y el método de envío. Generalmente, los envíos demoran entre 2 y 5 días hábiles.</p>
+
+                <p><strong>6. ¿Cómo sé si mi compra fue confirmada?</strong><br>
+                Una vez que completes la compra, recibirás un correo de confirmación y nos pondremos en contacto para coordinar los detalles.</p>
+
+                <p><strong>7. ¿Puedo cambiar o devolver un producto?</strong><br>
+                Sí, aceptamos cambios o devoluciones dentro de los 10 días hábiles posteriores a la recepción, siempre que el producto esté en condiciones originales. Consultanos para más detalles.</p>
+            </div>
+        </nav>
+
+        <div id="menuCarrito" class="menu-carrito oculto">
+            <div class="carrito-header">
+                <h2 class="compraTitle">Mi Compra</h2>
+                <button class="cerrar-menu" onclick="closeCarrito()">✕</button>
+            </div>
+            <div id="carrito-items"></div>
+            <div class="envio-section" id="envio-section">
+                <h3>Medios de envío</h3>
+                <div class="calculo-envio">
+                    <input type="text" id="codigo-postal" placeholder="Tu código postal" />
+                    <button onclick="calcularEnvio()">Calcular</button>
+                </div>
+                <p id="mensaje-envio"></p>
+
+                <div class="metodo-envio">
+                    <h4>Nuestro local</h4>
+                    <label>
+                        <input type="radio" name="metodo-envio" value="retiro-local" />
+                        Retiro en local - Tomás Garzón 1085, Oncativo, Córdoba <br />
+                        <small>Atención de lunes a viernes de 9:30 a 18:00 hs.</small>
+                        <span class="envio-costo">Gratis</span>
+                    </label>
+                    <h4>Envío</h4>
+                    <label>
+                        <input type="radio" name="metodo-envio" value="envio-domicilio" />
+                        Envío a domicilio <span class="envio-costo">Precio</span>
+                    </label>
+                </div>
+            </div>
+            <div id="carrito-subtotal" class="carrito-subtotal"></div>
+            <div id="carrito-footer" class="carrito-footer">
+                <button class="añadir-carrito-btn" id="iniciarCompraBtn">Iniciar compra</button>
+                <button class="añadir-carrito-btn" onclick="irAInicio()">Seguir comprando</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="detalle-articulo" id="detalle-articulo">
+        
+    </div>
+
+    <div class="productosRelacionados" id="productos-relacionados">
+        <h1 class="relacionadosTitulo">PRODUCTOS RELACIONADOS</h1>
+        <div class="carousel-container">
+            <button class="carousel2-btn left">&#10094;</button>
+            <div class="carousel-track">
+                
+            </div>
+            <button class="carousel2-btn right">&#10095;</button>
+        </div>
+    </div>
+
+    <a href="https://api.whatsapp.com/send?phone=5493532403017&text=Hola%20Arca%20Home,%20vengo%20desde%20la%20tienda%20online,%20estoy%20interesado/a%20en%20un%20producto" target="_blank" class="whatsapp-button">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/WhatsApp_icon.png" alt="WhatsApp" />
+</a>
+    
+
+    <footer id="footer">
+        <div class="footer-categories">
+            <h3>Categorías</h3>
+            <div class="footer-categories-lists">
+                <ul>
+                    <li><a href="index.html?categoria=BAZAR">Bazar</a></li>
+                    <li><a href="index.html?categoria=BAÑO">Baño</a></li>
+                    <li><a href="index.html?categoria=DECORACIÓN">Decoración</a></li>
+                    <li><a href="index.html?categoria=TEXTIL">Textil</a></li>
+                    <li><a href="index.html?categoria=INTERIOR">Muebles interior</a></li>
+                    <li><a href="index.html?categoria=MUEBLES EXTERIOR">Muebles exterior</a></li>
+                </ul>
+                <ul>
+                    <li><a href="index.html?categoria=SILLONES">Sillones</a></li>
+                    <li><a href="index.html?categoria=BANQUETAS">Banquetas</a></li>
+                    <li><a href="index.html?categoria=SILLAS">Sillas</a></li>
+                    <li><a href="index.html?categoria=MESAS">Mesas</a></li>
+                    <li><a href="index.html?categoria=OFICINA">Oficina</a></li>
+                    <li><a href="index.html?categoria=MESAS RATONAS">Mesas ratonas</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-contact">
+            <h3>Contacto</h3>
+            <p><img src="./images/email.png" alt=""> contacto@bazartienda.com</p>
+            <p><img src="./images/telephone.png" alt=""> 123-456-789</p>
+            <p><a href="https://www.instagram.com/elarca_home?igsh=aDI1NTY1NW4yZmtu" target="_blank">
+                <img src="./images/instagram.png" alt="">Elarca_home</a>
+            </p>
+            <p><a href="https://maps.app.goo.gl/44jLe2wmCSJZDseK8" target="_blank">
+                <img src="./images/location.png" alt="">Tomás Garzón 1085,<br>Oncativo, Córdoba</a>
+            </p>
+        </div>
+
+        <p class="footer-copyright">
+            &copy; 2025 El Arca Home. Todos los derechos reservados.
+        </p>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+</body>
+</html>

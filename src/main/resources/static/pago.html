@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Resumen de Compra | El Arca Home</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="icon" href="./images/logo arca.png" type="image/png">
+        <link rel="stylesheet" href="pago.css" />
+        <script defer src="pago.js"></script>
+    </head>
+<body>
+    <header>
+        <nav id="navbar" class="navbar">
+            <a href="resumen.html" class="nav-left">
+                <span class="texto-volver">Volver a la tienda</span>
+                <span class="flecha-volver"><img src="./images/arrow.png" alt="Volver"></span> 
+            </a>
+            <a href="index.html" id="logo" class="logo-container">
+                <img src="./images/logo arca.png" alt="Logo" class="logo">
+            </a>
+        </nav>
+    </header>
+    <main>
+        <div class="pantalla-izquierda">
+            <h1 style="text-align:center">¡Ya casi terminamos!</h1>
+
+            <section class="formulario">
+                <h4 id="title"></h4>
+
+                <!-- Formulario para retiro en local -->
+                <form id="form-retiro" style="display: none;">
+                <div class="campo">
+                    <label for="nombre-retiro">Nombre y apellido</label>
+                    <input type="text" id="nombre-retiro" required>
+                    <div class="error" id="error-nombre-retiro"></div>
+                </div>
+
+                <div class="campo">
+                    <label for="dni-retiro">DNI</label>
+                    <input type="text" id="dni-retiro" required>
+                    <div class="error" id="error-dni-retiro"></div>
+                </div>
+
+                <div class="campo">
+                    <label for="email-retiro">Email</label>
+                    <input type="email" id="email-retiro" required>
+                    <div class="error" id="error-email-retiro"></div>
+                </div>
+
+                <div class="campo">
+                    <label for="telefono-retiro">Teléfono</label>
+                    <input type="tel" id="telefono-retiro" required>
+                    <div class="error" id="error-telefono-retiro"></div>
+                </div>
+                </form>
+
+                <!-- Formulario para envío a domicilio -->
+                <form id="form-envio" style="display: none;">
+                <div class="campo">
+                    <label for="nombre-envio">Nombre y apellido</label>
+                    <input type="text" id="nombre-envio" required>
+                    <div class="error" id="error-nombre-envio"></div>
+                </div>
+
+                <div class="campo">
+                    <label for="email-envio">Email</label>
+                    <input type="email" id="email-envio" required>
+                    <div class="error" id="error-email-envio"></div>
+                </div>
+
+                <div class="campo">
+                    <label for="telefono-envio">Teléfono</label>
+                    <input type="tel" id="telefono-envio" required>
+                    <div class="error" id="error-telefono-envio"></div>
+                </div>
+
+                <div class="fila-horizontal">
+                    <div class="campo">
+                        <label for="calle">Calle</label>
+                        <input type="text" id="calle" required>
+                        <div class="error" id="error-calle"></div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="altura">Altura</label>
+                        <input type="text" id="altura">
+                    </div>
+
+                    <div class="campo">
+                        <label for="piso">Piso</label>
+                        <input type="text" id="piso">
+                    </div>
+
+                    <div class="campo">
+                        <label for="dpto">Dpto</label>
+                        <input type="text" id="dpto">
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label for="entreCalles">Entre calles</label>
+                    <input type="text" id="entreCalles" required>
+                    <div class="error" id="error-entreCalles"></div>
+                </div>
+
+                <div class="campo">
+                    <label for="localidad">Localidad</label>
+                    <input type="text" id="localidad" required>
+                    <div class="error" id="error-localidad"></div>
+                </div>
+
+                <div class="campo">
+                    <label for="provincia">Provincia</label>
+                    <select id="provincia" required>
+                        <option value="">Seleccioná una provincia</option>
+                        <option value="Buenos Aires">Buenos Aires</option>
+                        <option value="Catamarca">Catamarca</option>
+                        <option value="Chaco">Chaco</option>
+                        <option value="Chubut">Chubut</option>
+                        <option value="Córdoba">Córdoba</option>
+                        <option value="Corrientes">Corrientes</option>
+                        <option value="Entre Ríos">Entre Ríos</option>
+                        <option value="Formosa">Formosa</option>
+                        <option value="Jujuy">Jujuy</option>
+                        <option value="La Pampa">La Pampa</option>
+                        <option value="La Rioja">La Rioja</option>
+                        <option value="Mendoza">Mendoza</option>
+                        <option value="Misiones">Misiones</option>
+                        <option value="Neuquén">Neuquén</option>
+                        <option value="Río Negro">Río Negro</option>
+                        <option value="Salta">Salta</option>
+                        <option value="San Juan">San Juan</option>
+                        <option value="San Luis">San Luis</option>
+                        <option value="Santa Cruz">Santa Cruz</option>
+                        <option value="Santa Fe">Santa Fe</option>
+                        <option value="Santiago del Estero">Santiago del Estero</option>
+                        <option value="Tierra del Fuego">Tierra del Fuego</option>
+                        <option value="Tucumán">Tucumán</option>
+                    </select>
+                    <div class="error" id="error-provincia"></div>
+                </div>
+
+                <div class="campo">
+                    <label for="codigo-postal-envio">Código Postal</label>
+                    <input type="text" id="codigo-postal-envio" required>
+                    <div class="error" id="error-cp"></div>
+                </div>
+                </form>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="añadir-carrito-btn" id="btn-pagar">Pagar</button>
+                </div>
+            </section>
+        </div>
+
+        <div class="pantalla-derecha">
+            <img src="./images/tarjetas.jpg" alt="Medios de pago disponibles">
+        </div>
+
+    </main>
+    
+    
+</body>
+</html>

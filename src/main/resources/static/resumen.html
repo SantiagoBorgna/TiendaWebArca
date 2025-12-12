@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Resumen de Compra | El Arca Home</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="icon" href="./images/logo arca.png" type="image/png">
+        <link rel="stylesheet" href="resumen.css" />
+        <script defer src="resumen.js"></script>
+    </head>
+    <body>
+        <header>
+            <nav id="navbar" class="navbar">
+                <a href="index.html" class="nav-left">
+                    <span class="texto-volver">Volver a la tienda</span>
+                    <span class="flecha-volver"><img src="./images/arrow.png" alt="Volver"></span> 
+                </a>
+                <a href="index.html" id="logo" class="logo-container">
+                <img src="./images/logo arca.png" alt="Logo" class="logo">
+                </a>
+            </nav>
+        </header>
+
+        <main class="contenedor-principal">
+            <div class="columna-izquierda">
+                <section class="carrito-resumen">
+                    <div class="tabla-carrito">
+                        <div class="encabezado">
+                            <p class="col producto">Producto</p>
+                            <p class="col precio-unitario">Precio unitario</p>
+                            <p class="col cantidad">Cantidad</p>
+                            <p class="col subtotal">Subtotal</p>
+                            <p class="col eliminar"></p>
+                        </div>
+                    <div id="carrito-resumen"></div>
+                    </div>
+                </section>
+
+                <div class="productos-recomendados">
+                    <h2>Productos recomendados</h2>
+                    <div class="carrusel-nav">
+                        <button id="btn-prev" class="boton-carrusel izquierda" onclick="retrocederCarrusel()">‹</button>
+                        <div class="recomendados-wrapper">
+                            <div class="recomendados-grid" id="recomendados-container"></div>
+                        </div>
+                        <button id="btn-next" class="boton-carrusel derecha" onclick="avanzarCarrusel()">›</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="columna-derecha">
+                <h2 class="columna-titulo">Mi compra</h2>
+                <section class="envio-section" id="envio-section">
+
+                    <div class="calculo-envio">
+                    <input type="text" id="codigo-postal" placeholder="Tu código postal" />
+                    <button onclick="calcularEnvio()">Calcular</button>
+                    </div>
+
+                    <p id="mensaje-envio"></p>
+
+                    <div class="metodo-envio">
+                    <h4>Nuestro local</h4>
+                    <label>
+                        <input type="radio" name="metodo-envio" value="retiro-local" />
+                        Retiro en local - Tomás Garzón 1085, Oncativo, Córdoba <br />
+                        <small>Atención de lunes a viernes de 9:30 a 18:00 hs.</small>
+                        <span class="envio-costo">Gratis</span>
+                    </label>
+
+                    <h4>Envío</h4>
+                    <label>
+                        <input type="radio" name="metodo-envio" value="envio-domicilio" checked />
+                        Envío a domicilio <span class="envio-costo" id="costo-envio">$1000</span>
+                    </label>
+                    </div>
+                </section>
+
+                <section class="total">
+                    <hr />
+                    <h2>Resúmen</h2>
+                    <div class="resumen-precios">
+                        <p>Subtotal: <span id="subtotal-compra">$0,00</span></p>
+                        <p>Envío: <span id="subtotal-envio">$0,00</span></p>
+                        <hr />
+                        <p class="total-compra"><strong>Total: <span id="total-compra">$0,00</span></strong></p>
+                        <p class="total-compra-trans">O <span id="total-compra-trans">$0,00</span> con Transferencia</p>
+                    </div>
+                    <button class="pagar" id="btn-continuar">Pagar</button>
+                </section>
+
+            </div>
+        </main>
+
+
+        <footer id="footer">
+            <p class="footer-copyright">
+                &copy; 2025 El Arca Home. Todos los derechos reservados.
+            </p>
+        </footer>
+    </body>
+
+</html>
+
