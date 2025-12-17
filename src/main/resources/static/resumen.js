@@ -115,7 +115,7 @@ function eliminarDelCarrito(id) {
 
 function mostrarRecomendados() {
 
-  fetch("http://localhost:8080/api/articulos")
+  fetch(API_URL + "/articulos")
     .then(response => response.json())
     .then(articulos => {
       const idsCarrito = carrito.map(item => item.id);
@@ -316,6 +316,8 @@ function cargarDatosEnvio() {
   }
 }
 
+// --- LÓGICA DE PAGO Y REDIRECCIÓN ---
+
 async function iniciarCompra() {
   const metodoEnvio = document.querySelector('input[name="metodo-envio"]:checked');
   const cp = document.getElementById("codigo-postal").value;
@@ -325,17 +327,25 @@ async function iniciarCompra() {
     return;
   }
 
-  const medioDePago = "Online";
-  const cliente = "Santiago desde web";
-  const sucursal = "Oncativo";
-  const montoTotal = calcularSubtotalCarrito();
-  const articulosCarrito = carrito.map(articulo => `${articulo.nombre} x${articulo.cantidad}`).join(" / ");
+  // 1. Calculamos los totales finales
+  const subtotal = calcularSubtotalCarrito();
+  
+  // Obtenemos precio de envío (si hay)
+  let costoEnvio = 0;
+  const envioElement = document.getElementById("subtotal-envio");
+  if (envioElement) {
+    const texto = envioElement.textContent.replace("$", "").replace(/\./g, "").replace(",", "."); // Limpieza de formato
+    costoEnvio = parseFloat(texto) || 0;
+  }
 
+  const montoTotal = subtotal + costoEnvio;
+
+  // 2. Preparamos el objeto de venta para tu Base de Datos
   const venta = {
-    sucursalVenta: sucursal,
-    clienteVenta: cliente,
-    medioDePagoVenta: medioDePago,
-    articulosVenta: articulosCarrito,
+    sucursalVenta: "Oncativo",
+    clienteVenta: "Cliente Web", // A futuro podrías pedir el nombre en un input
+    medioDePagoVenta: "Fiserv/Tarjeta",
+    articulosVenta: carrito.map(a => `${a.nombre} x${a.cantidad}`).join(" / "),
     montoVenta: montoTotal,
     items: carrito.map(item => ({
       id: item.id,
@@ -343,28 +353,78 @@ async function iniciarCompra() {
     }))
   };
 
-  let response;
   try {
-    response = await fetch("http://localhost:8080/api/articulos/venta", {
+    // A. PRIMERO: Registramos la venta en tu BD (Descuenta stock)
+    // Usamos API_URL gracias al archivo global.js
+    const responseVenta = await fetch(API_URL + "/articulos/venta", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(venta)
     });
     
-    if (!response.ok) {
-      const errorText = await response.text();  // Mostrar el texto de error devuelto por el backend
-      throw new Error("Error al registrar la venta: " + errorText);
+    if (!responseVenta.ok) {
+      const errorText = await responseVenta.text();
+      throw new Error("Error al registrar venta: " + errorText);
+    }
+    console.log("✅ Venta registrada en BD local");
+
+    // B. SEGUNDO: Iniciamos el trámite con Fiserv
+    console.log("🔄 Solicitando Hash a Fiserv para monto: $" + montoTotal);
+    
+    const responsePago = await fetch(API_URL + "/pagos/iniciar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ monto: montoTotal })
+    });
+
+    if (!responsePago.ok) {
+        throw new Error("Error al iniciar el pago con el servidor");
     }
 
-    alert("¡Compra realizada con éxito!");
-    alert(`Compraste ${venta.articulosVenta}`);
-    carrito = [];
-    localStorage.setItem("carrito", JSON.stringify(carrito));
-    renderizarCarrito();
+    const datosFiserv = await responsePago.json();
+    
+    // C. TERCERO: Redirigimos al usuario a la página segura de Fiserv
+    redirigirAFiserv(datosFiserv);
+
   } catch (error) {
-    alert("Hubo un error al procesar la compra: " + error.message);
+    console.error(error);
+    alert("Hubo un error: " + error.message);
   }
+}
+
+// Función mágica que crea un formulario invisible y envía al usuario a Fiserv
+function redirigirAFiserv(datos) {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = datos.urlFiserv; 
+
+    // Detectamos automáticamente dónde estamos (localhost o web)
+    const baseUrl = window.location.origin; 
+
+    const campos = {
+        "storename": datos.storeId,
+        "txndatetime": datos.txndatetime,
+        "chargetotal": datos.chargetotal,
+        "currency": datos.currency,
+        "hashExtended": datos.hash,
+        "timezone": "America/Argentina/Cordoba",
+        "txntype": "sale",
+        
+        // AGREGAMOS ESTAS DOS LÍNEAS IMPORTANTES:
+        "responseSuccessURL": baseUrl + "/exito.html",
+        "responseFailURL": baseUrl + "/fallo.html"
+    };
+
+    for (const key in campos) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = campos[key];
+        form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    console.log("Redirigiendo a Fiserv con retorno a: " + baseUrl);
+    form.submit();
 }
 

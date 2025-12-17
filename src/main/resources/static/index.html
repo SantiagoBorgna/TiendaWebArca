@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Arca Home</title>
+    <title>Inicio - El Arca Home</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="icon" href="./images/logo arca.png" type="image/png">
+    <link rel="icon" href="./images/logo-arca.png" type="image/png">
     <link rel="stylesheet" href="styles.css">
+    <script src="global.js"></script>
     <script defer src="script.js"></script>
 </head>
 <body>
@@ -194,12 +195,18 @@
             <!-- Aquí se cargan los productos dinámicamente -->
         </section>
 
+        <div id="cargar-mas-container">
+            <button id="btn-cargar-mas" onclick="cargarSiguienteTanda()">
+                Ver más productos
+            </button>
+        </div>
+
         <p id="mensaje-vacio">No se encontraron resultados</p>
     </main>
 
-    <a href="https://api.whatsapp.com/send?phone=5493532403017&text=Hola%20Arca%20Home,%20vengo%20desde%20la%20tienda%20online,%20estoy%20interesado/a%20en%20un%20producto" target="_blank" class="whatsapp-button">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/WhatsApp_icon.png" alt="WhatsApp" />
-</a>
+    <a href="https://api.whatsapp.com/send?phone=5493572439160&text=Hola%20Arca%20Home,%20vengo%20desde%20la%20tienda%20online,%20estoy%20interesado/a%20en%20un%20producto" target="_blank" class="whatsapp-button">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/WhatsApp_icon.png" alt="WhatsApp" />
+    </a>
     
     <footer id="footer">
         <div class="footer-categories">
@@ -227,7 +234,7 @@
         <div class="footer-contact">
             <h3>Contacto</h3>
             <p><img src="./images/email.png" alt=""> contacto@bazartienda.com</p>
-            <p><img src="./images/telephone.png" alt=""> 123-456-789</p>
+            <p><img src="./images/telephone.png" alt="">+54 9 3572439160</p>
             <p><a href="./https://www.instagram.com/elarca_home?igsh=aDI1NTY1NW4yZmtu" target="_blank">
                 <img src="./images/instagram.png" alt="">Elarca_home</a>
             </p>

@@ -6,7 +6,9 @@ window.addEventListener('scroll', function () {
         navbar.classList.remove('shrink');
     }
 });
+
 let articuloCargado;
+
 /* CARGAR DATOS DESDE DB */ 
 document.addEventListener("DOMContentLoaded", () => {
     
@@ -18,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    fetch(`/api/articulos/${id}`)
+    fetch(API_URL + "/articulos/" + id)
         .then(res => {
             if (!res.ok) throw new Error("Producto no encontrado");
             return res.json();
@@ -37,13 +39,63 @@ document.addEventListener("DOMContentLoaded", () => {
                 <img src="${src}" alt="Miniatura ${idx + 1}" class="miniatura" style="cursor: pointer;">
             `).join("");
 
+            // CATEGORÍAS ESPECIALES
+            const categoriasEspeciales = [
+                "MUEBLES EXTERIOR", 
+                "SILLONES", 
+                "BANQUETAS", 
+                "SILLAS", 
+                "MESAS", 
+                "OFICINA", 
+                "MESAS RATONAS",
+                "MUEBLES INTERIOR"
+            ];
+
+            const esCategoriaEspecial = categoriasEspeciales.includes(articulo.categoria.toUpperCase());
+            const stockTotal = articulo.cant1 + articulo.cant3;
+            const sinStock = stockTotal === 0;
+
+            // Opciones de compra
+            let opcionesCompraHTML = "";
+
+            if (sinStock && esCategoriaEspecial) {
+                const mensaje = `Hola El Arca Home, vengo desde la web, estoy interesado en ${mayus(articulo.nombre)}`;
+                const linkWhatsapp = `https://wa.me/5493572439160?text=${encodeURIComponent(mensaje)}`;
+                
+                opcionesCompraHTML = `
+                    <div class="consulta-container">
+                        <p class="texto-consulta">¿Querés saber más?</p>
+                        <a href="${linkWhatsapp}" target="_blank" class="btn-whatsapp-contacto">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/WhatsApp_icon.png" alt="WhatsApp" /> CONTACTANOS
+                        </a>
+                    </div>
+                `;
+            } else {
+                opcionesCompraHTML = `
+                    <div class="cantidad-control">
+                        ${stockTotal === 0
+                            ? `<button disabled>−</button>
+                               <span id="cantidad">0</span>
+                               <button disabled>+</button>`
+                            : `<button onclick="cambiarCantidad2(obtenerCantidad() - 1)">−</button>
+                               <span id="cantidad">1</span>
+                               <button onclick="cambiarCantidad2(obtenerCantidad() + 1)">+</button>`
+                        }
+                    </div>
+                    ${stockTotal === 0
+                        ? `<button class="añadir-carrito-btn" disabled style="opacity: 0.6; cursor: not-allowed;">Sin stock</button>`
+                        : `<button class="añadir-carrito-btn">Añadir al carrito</button>`
+                    }
+                `;
+            }
+
             // Si es móvil, usa swiper, si no, usa miniaturas
             contenedor.innerHTML = esMobile ? `
                 <div class="swiper-container">
                     <div class="swiper-wrapper">
                         ${imagenes.map(src => `
                             <div class="swiper-slide">
-                                <img src="${src}"" />
+                                <img src="${src}" />
                             </div>
                         `).join("")}
                     </div>
@@ -58,41 +110,26 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p class="precio-transferencia">$${(articulo.precioVenta * 0.8).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} con Transferencia</p>
                     <div class="info-pagos">
                         <div class="info-pagos-linea">
-                            <img src="./images/credit-card.png" alt="tarjeta"">
+                            <img src="./images/credit-card.png" alt="tarjeta">
                             <p>6 cuotas sin interés de $${(articulo.precioVenta / 6).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                         </div>
                         <div class="info-pagos-linea">
-                            <img src="./images/transfer-money.png" alt="transferencia"">
+                            <img src="./images/transfer-money.png" alt="transferencia">
                             <p>20% de descuento pagando con Transferencia</p>
                         </div>
                         <div class="info-pagos-linea">
-                            <img src="./images/delivery-truck.png" alt="envios"">
+                            <img src="./images/delivery-truck.png" alt="envios">
                             <p>Envíos a todo el país</p>
                         </div>
                     </div>
                     <div class="poco-stock">
-                        ${(articulo.cant1 + articulo.cant3) <= 5 && (articulo.cant1 + articulo.cant3) > 0
-                            ? `<h5 class="aviso-poco-stock">¡Quedan ${(articulo.cant1 + articulo.cant3)} en stock, no te lo pierdas!</h5>`
+                        ${stockTotal <= 5 && stockTotal > 0
+                            ? `<h5 class="aviso-poco-stock">¡Quedan ${stockTotal} en stock, no te lo pierdas!</h5>`
                             : ``
                         }
                     </div>
                     <div class="opciones-compra">
-                        ${(articulo.cant1 + articulo.cant3) === 0
-                            ? `<div class="cantidad-control">
-                                    <button onclick="cambiarCantidad2(-1)">−</button>
-                                    <span id="cantidad">1</span>
-                                    <button onclick="cambiarCantidad2(1)">+</button>
-                                  </div>`
-                                : `<div class="cantidad-control">
-                                    <button onclick="cambiarCantidad2(obtenerCantidad() - 1)">–</button>
-                                    <span id="cantidad">1</span>
-                                    <button onclick="cambiarCantidad2(obtenerCantidad() + 1)">+</button>
-                                  </div>`
-                        }
-                        ${(articulo.cant1 + articulo.cant3) === 0
-                            ? `<button class="añadir-carrito-btn" disabled style="opacity: 0.6; cursor: not-allowed;">Sin stock</button>`
-                            : `<button class="añadir-carrito-btn">Añadir al carrito</button>`
-                        }
+                        ${opcionesCompraHTML}
                     </div>
                 </div>
               ` : `
@@ -113,41 +150,26 @@ document.addEventListener("DOMContentLoaded", () => {
                         <p class="precio-transferencia">$${(articulo.precioVenta * 0.8).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} con Transferencia</p>
                         <div class="info-pagos">
                             <div class="info-pagos-linea">
-                                <img src="./images/credit-card.png" alt="tarjeta"">
+                                <img src="./images/credit-card.png" alt="tarjeta">
                                 <p>6 cuotas sin interés de $${(articulo.precioVenta / 6).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                             </div>
                             <div class="info-pagos-linea">
-                                <img src="./images/transfer-money.png" alt="transferencia"">
+                                <img src="./images/transfer-money.png" alt="transferencia">
                                 <p>20% de descuento pagando con Transferencia</p>
                             </div>
                             <div class="info-pagos-linea">
-                                <img src="./images/delivery-truck.png" alt="envios"">
+                                <img src="./images/delivery-truck.png" alt="envios">
                                 <p>Envíos a todo el país</p>
                             </div>
                         </div>
                         <div class="poco-stock">
-                            ${(articulo.cant1 + articulo.cant3) <= 5 && (articulo.cant1 + articulo.cant3) > 0
-                                ? `<h5 class="aviso-poco-stock">¡Quedan ${(articulo.cant1 + articulo.cant3)} en stock, no te lo pierdas!</h5>`
+                            ${stockTotal <= 5 && stockTotal > 0
+                                ? `<h5 class="aviso-poco-stock">¡Quedan ${stockTotal} en stock, no te lo pierdas!</h5>`
                                 : ``
                             }
                         </div>
                         <div class="opciones-compra">
-                            ${(articulo.cant1 + articulo.cant3) === 0
-                                ? `<div class="cantidad-control">
-                                    <button onclick="cambiarCantidad2(-1)">−</button>
-                                    <span id="cantidad">1</span>
-                                    <button onclick="cambiarCantidad2(1)">+</button>
-                                  </div>`
-                                : `<div class="cantidad-control">
-                                    <button onclick="cambiarCantidad2(obtenerCantidad() - 1)">–</button>
-                                    <span id="cantidad">1</span>
-                                    <button onclick="cambiarCantidad2(obtenerCantidad() + 1)">+</button>
-                                  </div>`
-                            }
-                            ${(articulo.cant1 + articulo.cant3) === 0
-                                ? `<button class="añadir-carrito-btn" disabled style="opacity: 0.6; cursor: not-allowed;">Sin stock</button>`
-                                : `<button class="añadir-carrito-btn">Añadir al carrito</button>`
-                            }
+                            ${opcionesCompraHTML}
                         </div>
                     </div>
                   `;
@@ -165,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
               }
 
             const btnCarrito = contenedor.querySelector('.añadir-carrito-btn');
-            if ((articulo.cant1 + articulo.cant3) > 0) {
+            if (btnCarrito && stockTotal > 0) {
                 btnCarrito.addEventListener("click", function(event) {
                     event.stopPropagation();
                     const cantidadSpan = document.getElementById("cantidad");
@@ -180,17 +202,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const miniaturas = contenedor.querySelectorAll(".miniatura");
             const imagenPrincipal = contenedor.querySelector("#imagen-principal");
 
-            miniaturas.forEach(miniatura => {
-                miniatura.addEventListener('mouseover', () => {
-                    imagenPrincipal.src = miniatura.src;
+            if(miniaturas.length > 0 && imagenPrincipal) {
+                miniaturas.forEach(miniatura => {
+                    miniatura.addEventListener('mouseover', () => {
+                        imagenPrincipal.src = miniatura.src;
+                    });
                 });
-            });
+            }
 
 
-            /* ARMAR TARJETAS */
+            /* ARMAR TARJETAS DE RELACIONADOS */
             const categoriaActual = articulo.categoria;
 
-            fetch(`/api/articulos/categoria/${encodeURIComponent(categoriaActual)}`)
+            fetch(`${API_URL}/articulos/categoria/${encodeURIComponent(categoriaActual)}`)
                 .then(res => {
                     if (!res.ok) throw new Error("Error al traer productos relacionados");
                     return res.json();
@@ -227,9 +251,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     relacionados
                         .filter(a => a.id !== articulo.id)
                         .forEach(a => {
-                            const card = document.createElement('div');
+                            const card = document.createElement('a');
                             card.className = 'producto-card';
+                            card.href = `detalle.html?id=${a.id}`;
                             card.innerHTML = `
+                                <img src="${a.img1}" alt="${a.nombre}">
+                                <h3 id="nombre-art" class="nombreArt">${mayus(a.nombre)}</h3>
+                                <p id="precio-art" class="precioArt">$${a.precioVenta.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                <p class="precioTrans">$${(a.precioVenta * 0.8).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} con Transferencia</p>
+                                
+                                <div class="añadir-carrito-btn ver-mas-btn" style="display:block; width:fit-content; margin: 10px auto; padding: 10px 20px;">Ver más</div>
+                            `;
+                            /*card.innerHTML = `
                                 <img src="${a.img1}" alt="${a.nombre}">
                                 <h3 id="nombre-art" class="nombreArt">${mayus(a.nombre)}</h3>
                                 <p id="precio-art" class="precioArt">$${a.precioVenta.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
@@ -239,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             const btnMas = card.querySelector('.ver-mas-btn');
                             btnMas.addEventListener('click', () => {
                                 window.location.href = `detalle.html?id=${a.id}`;
-                            });
+                            });*/
 
                             track.appendChild(card);
                         });
@@ -355,21 +388,11 @@ function cerrarTodos(){
 
 function searchProducts() {
     const input = document.querySelector(".search-input");
-    const texto = input.value.trim().toLowerCase();
-  
-    if (texto === "") return;
-  
-    const filtrados = articulosCargados.filter(articulo =>
-      articulo.nombre.toLowerCase().includes(texto)
-    );
-  
-    renderizarArticulos(filtrados);
-    input.value = "";
-    closeMenu();         
-    closeMenuInstrucciones();  
-    closeMenuInfo();
-    closeMenuPreguntas();
-    document.getElementById('mainTitle').style.display = 'none';
+    const texto = input.value.trim(); 
+
+    if (texto !== "") {
+        window.location.href = `index.html?busqueda=${encodeURIComponent(texto)}`;
+    }
 }
 
 function checkOverlay() {

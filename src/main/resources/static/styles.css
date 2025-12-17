@@ -52,7 +52,11 @@ body {
 .navbar-right img{
     height: 35px;
     width: 35px;
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none; 
 }
+
 
 .cart-btn,
 .menu-btn {
@@ -380,6 +384,9 @@ body {
     object-fit: cover;
     margin-right: 10px;
     border-radius: 8px;
+    pointer-events: none; 
+    user-select: none;
+    -webkit-user-drag: none; 
 }
   
 #carrito-items .item {
@@ -427,6 +434,9 @@ body {
 .btn-eliminar img {
     height: 20px;
     width: 20px;
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none; 
 }
 
 .btn-eliminar:hover {
@@ -555,6 +565,9 @@ body {
     width: 100%;
     height: 500px;
     object-fit: cover;
+    pointer-events: none; 
+    user-select: none;
+    -webkit-user-drag: none; 
 }
 
 .medios-pago-grande {
@@ -566,6 +579,9 @@ body {
     max-width: 100%;
     height: 200px;
     object-fit: cover;
+    pointer-events: none; 
+    user-select: none;
+    -webkit-user-drag: none; 
 }
 
 .medios-pago-pequeño{
@@ -598,16 +614,31 @@ main {
     background-color: white;
     padding: 20px;
     text-align: center;
-    border: none; 
-    border-radius: 12px; 
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0); 
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
     transition: box-shadow 0.3s ease, transform 0.2s ease;
     cursor: pointer;
+    display: flex; 
+    flex-direction: column; 
+    text-decoration: none; 
+    color: inherit;   
+    height: 100%;  
+}
+
+.product:visited {
+    color: inherit;
 }
 
 .product:hover {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
+}
+
+.product img {
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none; 
 }
 
 .stock-banner {
@@ -656,19 +687,20 @@ main {
     background-color: rgba(0,0,0,0.5);
     color: white;
     border: none;
+    border-radius: 3px;
     font-size: 2rem;
     padding: 5px 10px;
     cursor: pointer;
     z-index: 10;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    opacity: 0.7;
+    /*transition: opacity 0.3s ease;
     pointer-events: none; /* Evita que se hagan clic cuando están ocultas */
 }
   
-.carousel:hover .carousel-btn {
+/*.carousel:hover .carousel-btn {
     opacity: 1;
     pointer-events: auto;
-}
+}*/
   
 .carousel-btn.prev {
     left: 10px;
@@ -703,6 +735,22 @@ main {
     font-style: italic;
     text-align: center;
     margin-bottom: 12px;
+}
+
+#cargar-mas-container{
+    text-align: center; 
+    margin: 80px 0 40px 0; 
+    display: none;
+}
+
+#btn-cargar-mas{
+    padding: 10px 14px;
+    background-color: #F0E9E1;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .sort-options {
@@ -779,7 +827,11 @@ main {
 .whatsapp-button img {
     width: 35px;
     height: 35px;
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none; 
 }
+
 
 .whatsapp-button:hover {
     transform: scale(1.1);
@@ -850,6 +902,9 @@ footer {
     height: 22px;
     margin-right: 9px;
     vertical-align: middle;
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none; /
 }
 
 .footer-contact a {
@@ -889,25 +944,28 @@ footer {
 .detalle-imagenes {
     display: flex;
     align-items: flex-start;
-    gap: 20px; /* Espacio entre miniaturas e imagen principal */
+    gap: 20px;
     margin-top: 20px;
 }
 
 .miniaturas {
     display: flex;
     flex-direction: column;
-    gap: 17px; /* Espacio entre miniaturas */
-    margin-left: 80px; /* Despegarlas de la izquierda */
+    gap: 17px;
+    margin-left: 80px; 
 }
 
 .miniaturas img {
-    width: 120px; /* Más grandes */
+    width: 120px; 
     height: 120px;
     object-fit: cover;
     cursor: pointer;
     border-radius: 8px;
     border: 2px solid transparent;
     transition: border 0.3s;
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none; 
 }
 
 .miniaturas img:hover {
@@ -915,11 +973,14 @@ footer {
 }
 
 .imagen-principal img {
-    width: 600px; /* Más chica */
-    height: 600px; /* Hacemos cuadrada */
+    width: 600px; 
+    height: 600px; 
     object-fit: cover;
     border-radius: 8px;
     margin-left: 60px;
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none; 
 }
 
 .detalle-info {
@@ -971,15 +1032,18 @@ footer {
 }
 
 .info-pagos-linea img {
-  width: 22px; /* o ajustá según tu diseño */
+  width: 22px; 
   height: auto;
   margin-right: 10px;
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none; 
 }
 
 .info-pagos-linea p {
   font-size: 16px;
   margin: 0;
-  color: black; /* o el color que estés usando para el texto */
+  color: black; 
 }
 
 .opciones-compra {
@@ -1010,6 +1074,53 @@ footer {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s, transform 0.2s;
+}
+
+.consulta-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
+    width: 100%;
+    margin-top: 10px;
+}
+
+.texto-consulta {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.btn-whatsapp-contacto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #25D366; 
+    color: white;
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, transform 0.2s;
+    width: 30%; 
+    max-width: 400px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-whatsapp-contacto:hover {
+    background-color: #1ebe57; 
+    transform: scale(1.005);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.btn-whatsapp-contacto img {
+    width: 25px;
+    height: 25px;
+    margin-right: 5px;
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none;
 }
 
 .productosRelacionados {
@@ -1046,6 +1157,16 @@ footer {
     border-radius: 12px; 
     box-shadow: 0 0 0 rgba(0, 0, 0, 0); 
     transition: box-shadow 0.3s ease, transform 0.2s ease;
+
+    text-decoration: none;  
+    color: inherit;        
+    display: flex;          
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.producto-card:visited {
+    color: inherit; 
 }
 
 .producto-card:hover {
@@ -1058,6 +1179,14 @@ footer {
     height: 350px;
     object-fit: cover;
     border-radius: 12px;
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none; 
+}
+
+.ver-mas-btn {
+    cursor: pointer;
+    text-align: center;
 }
 
 .carousel2-btn {

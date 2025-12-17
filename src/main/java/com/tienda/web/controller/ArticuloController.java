@@ -5,10 +5,8 @@ import com.tienda.web.model.ItemVenta;
 import com.tienda.web.model.Venta;
 import com.tienda.web.repository.ArticuloRepository;
 import com.tienda.web.service.ArticuloService;
-import com.tienda.web.service.TiendaNubeService;
 import com.tienda.web.service.VentaService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,13 +20,14 @@ public class ArticuloController {
 
     private final ArticuloRepository articuloRepository;
     private final VentaService ventaService;
-    private final ArticuloService articuloService;
+    // private final ArticuloService articuloService; // Si no lo usas acá, se puede
+    // borrar
 
     public ArticuloController(ArticuloRepository articuloRepository, VentaService ventaService,
             ArticuloService articuloService) {
         this.articuloRepository = articuloRepository;
         this.ventaService = ventaService;
-        this.articuloService = articuloService;
+        // this.articuloService = articuloService;
     }
 
     @GetMapping
@@ -45,13 +44,13 @@ public class ArticuloController {
 
     @GetMapping("/categoria/{categoriaArticulo}")
     public List<Articulo> getArticulosPorCategoria(@PathVariable String categoriaArticulo) {
-        return articuloRepository.findByCategoriaArticulo(categoriaArticulo);
+        return articuloRepository.findByCategoriaArticuloAndCiudadArticulo(categoriaArticulo, "Oncativo");
     }
 
     @PostMapping("/venta")
     public ResponseEntity<String> realizarVenta(@RequestBody Venta venta) {
         try {
-            // Actualizar stock
+            // 1. Validar y Descontar Stock
             if (venta.getItems() != null) {
                 for (ItemVenta item : venta.getItems()) {
                     articuloRepository.findById(item.getId()).ifPresent(articulo -> {
@@ -60,22 +59,22 @@ public class ArticuloController {
                         int total = stock1 + stock3;
 
                         if (item.getCantidad() > total) {
-                            throw new RuntimeException("Stock insuficiente para el artículo: " + articulo.getNombre());
+                            throw new RuntimeException("Stock insuficiente para: " + articulo.getNombre());
                         }
 
+                        // Lógica de descuento de stock (prioriza cant1)
                         if (item.getCantidad() <= stock1) {
                             articulo.setCant1(stock1 - item.getCantidad());
                         } else {
                             articulo.setCant1(0);
                             articulo.setCant3(stock3 - (item.getCantidad() - stock1));
                         }
-
                         articuloRepository.save(articulo);
                     });
                 }
             }
 
-            // Registrar la venta
+            // 2. Registrar la venta en la base de datos
             ventaService.registrarVenta(
                     venta.getSucursalVenta(),
                     venta.getClienteVenta(),
@@ -83,27 +82,10 @@ public class ArticuloController {
                     venta.getArticulosVenta(),
                     venta.getMontoVenta());
 
-            return ResponseEntity.ok("Venta registrada y stock actualizado.");
+            return ResponseEntity.ok("Venta registrada con éxito");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al registrar la venta: " + e.getMessage());
         }
     }
-
-    @Autowired
-    private TiendaNubeService tiendaNubeService;
-
-    @GetMapping("/sincronizar")
-    public ResponseEntity<String> sincronizarTienda() {
-        List<Articulo> articulos = articuloService.obtenerArticulosDeArca();
-        tiendaNubeService.sincronizarArticulos(articulos);
-        return ResponseEntity.ok("Sincronización completada.");
-    }
-
-    @GetMapping("/productos")
-    public ResponseEntity<Void> obtenerProductosTiendaNube() {
-        tiendaNubeService.obtenerProductosTiendaNube();
-        return ResponseEntity.ok().build();
-    }
-
 }

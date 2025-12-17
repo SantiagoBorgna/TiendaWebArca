@@ -1,25 +1,41 @@
+// VARIABLES GLOBALES PARA PAGINACIÓN
+let productosGlobales = []; // Lista completa
+let indiceActual = 0;
+const POR_PAGINA = 20;
+
 let articulosCargados = [];
 let carrito = [];
 
 /* CARGAR ARTICULOS DESDE DB CHEQUEANDO SI HAY QUE APLICAR ALGUN FILTRO */
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("https://backend-tienda-9gtc.onrender.com/api/articulos")
+  fetch(API_URL + "/articulos")
     .then((response) => response.json())
     .then((articulos) => {
       articulosCargados = articulos;
 
-      // Chequea si hay un parámetro de categoría
+      // Obtener los parámetros de la URL
       const params = new URLSearchParams(window.location.search);
       const categoria = params.get('categoria');
+      const busqueda = params.get('busqueda'); 
 
-      if (categoria) {
+      if (busqueda) {
+          // Si hay búsqueda pendiente, poner el texto en la cajita
+          const input = document.querySelector(".search-input");
+          if (input) input.value = busqueda;
+
+          // Ejecutar la función de buscar automáticamente
+          const filtrados = articulosCargados.filter(a => a.nombre.toLowerCase().includes(busqueda.toLowerCase()));
+          iniciarListado(filtrados); 
+      } else if (categoria) { 
+        // Si no es búsqueda, chequear categoría
         if (categoria === "INTERIOR") {
             mueblesInterior(); 
         } else {
             filtrarProductos(categoria);
         }
       } else {
-        renderizarArticulos(articulosCargados);
+        // Si no hay nada, mostrar todo
+        iniciarListado(articulosCargados);
       }
   })
   .catch((error) => console.error("Error cargando artículos:", error));
@@ -80,19 +96,40 @@ contenedor.querySelectorAll(".carousel").forEach((carousel) => {
 });
 
 function searchProducts() {
-  const input = document.querySelector(".search-input");
-  const texto = input.value.trim().toLowerCase();
+    const input = document.querySelector(".search-input");
+    const texto = input.value.trim().toLowerCase();
+  
+    if (texto === "") return;
+  
+    // Filtrar los artículos
+    const filtrados = articulosCargados.filter(articulo =>
+      articulo.nombre.toLowerCase().includes(texto)
+    );
+  
+    // Lógica del Cartel "No se encontraron resultados"
+    const mensaje = document.getElementById("mensaje-vacio");
+    const grid = document.getElementById("products-grid");
 
-  if (texto === "") return;
+    if (filtrados.length === 0) {
+        mensaje.style.display = "block"; 
+        grid.innerHTML = "";             
+    } else {
+        mensaje.style.display = "none";  
+        iniciarListado(filtrados);
+    }
 
-  const filtrados = articulosCargados.filter(articulo =>
-    articulo.nombre.toLowerCase().includes(texto)
-  );
+    const titulo = document.getElementById('mainTitle');
+    if (titulo) {
+        titulo.innerHTML = `<h1>Resultados para: "${mayus(texto)}"</h1>`;
+        titulo.style.display = 'block';
+    }
 
-  renderizarArticulos(filtrados);
-  input.value = "";
-  cerrarTodos();
-  document.getElementById('mainTitle').style.display = 'none';
+    // Actualizar la URL
+    const nuevaURL = window.location.protocol + "//" + window.location.host + window.location.pathname + "?busqueda=" + encodeURIComponent(texto);
+    window.history.pushState({path: nuevaURL}, '', nuevaURL);
+
+    input.value = "";
+    cerrarTodos(); 
 }
 
 function checkOverlay() {
@@ -187,27 +224,66 @@ function cerrarTodos(){
   closeCarrito();
 }
 
-function renderizarArticulos(articulos) {
+function renderizarArticulos(articulos, limpiar = true) {
     const contenedor = document.getElementById("products-grid");
-    contenedor.innerHTML = "";
+
+    if (limpiar) {
+        contenedor.innerHTML = "";
+    }
 
     const articulosOrdenados = [...articulos].sort((a, b) => (b.cant1 + b.cant3) - (a.cant1 + a.cant3));
 
     articulosOrdenados.forEach((articulo) => {
-        const categoria = articulo.categoria;
-        const tarjeta = document.createElement("div");
-        tarjeta.className = "product";
+        const tarjeta = document.createElement("a");
+        tarjeta.className = "product card";
+        tarjeta.href = `detalle.html?id=${articulo.id}`;
+        tarjeta.setAttribute("data-id", articulo.id);
+
+        // Categorias especiales (Muebles)
+        const categoriasEspeciales = [
+            "MUEBLES EXTERIOR", 
+            "SILLONES", 
+            "BANQUETAS", 
+            "SILLAS", 
+            "MESAS", 
+            "OFICINA", 
+            "MESAS RATONAS"
+        ];
+
+        const esCategoriaEspecial = categoriasEspeciales.includes(articulo.categoria.toUpperCase());
+        const stockTotal = articulo.cant1 + articulo.cant3;
+        const sinStock = stockTotal === 0;
 
         const imagenes = [articulo.img1, articulo.img2, articulo.img3, articulo.img4]
           .filter(src => src && src.trim() !== "");
           
-        const imagenesHTML = imagenes.map((src, index) => `
-            <img src="${src}" class="carousel-img ${index === 0 ? 'active' : ''}" />
-        `).join("");
+        // Lazy loading  
+        const imagenesHTML = imagenes.map((src, index) => {
+            if (index === 0) {
+                // La primera imagen se carga normal
+                return `<img src="${src}" class="carousel-img active" alt="${articulo.nombre}" />`;
+            } else {
+                // Las demás se cargan ocultas para no lentificar
+                return `<img data-src="${src}" class="carousel-img lazy-img" alt="${articulo.nombre}" />`;
+            }
+        }).join("");
 
-        const cartelSinStock = (articulo.cant1 + articulo.cant3) === 0
-            ? `<div class="stock-banner">SIN STOCK</div>`
-            : "";
+        let cartelSinStock = "";
+        if (sinStock && !esCategoriaEspecial) {
+            cartelSinStock = `<div class="stock-banner">SIN STOCK</div>`;
+        }
+
+        let botonHTML = "";
+
+        if (!sinStock) {
+            botonHTML = `<button class="añadir-carrito-btn">Añadir al carrito</button>`;
+        } else {
+            if (esCategoriaEspecial) {
+                botonHTML = `<button class="añadir-carrito-btn btn-ver-mas">Ver más</button>`;
+            } else {
+                botonHTML = `<button class="añadir-carrito-btn" disabled style="opacity: 0.6; cursor: not-allowed;">Sin stock</button>`;
+            }
+        }
           
         tarjeta.innerHTML = `
             <div class="carousel">
@@ -222,25 +298,32 @@ function renderizarArticulos(articulos) {
                 <h3 id="nombre-art" class="nombreArt">${mayus(articulo.nombre)}</h3>
                 <div class="precio-container">
                   <p id="precio-art" class="precioArt">$${articulo.precioVenta.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                  <p class="precioTrans">$${(articulo.precioVenta * 0.8).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} con Trasferencia</p>
+                  <p class="precioTrans">$${(articulo.precioVenta * 0.8).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} con Transferencia</p>
                 </div>
             </div>
-              ${(articulo.cant1 + articulo.cant3) === 0
-                ? `<button class="añadir-carrito-btn" disabled style="opacity: 0.6; cursor: not-allowed;">Sin stock</button>`
-                : `<button class="añadir-carrito-btn">Añadir al carrito</button>`
-            }
+            ${botonHTML}
         `;
 
-        tarjeta.setAttribute("data-id", articulo.id);
+        // Activador del Lazy Loading 
+        tarjeta.addEventListener("mouseenter", function() {
+            const imagenesDormidas = this.querySelectorAll("img.lazy-img");
+            imagenesDormidas.forEach(img => {
+                if (img.dataset.src) {
+                    img.src = img.dataset.src; // Pasa el link al src real
+                    img.removeAttribute("data-src");
+                    img.classList.remove("lazy-img"); // Ya no es lazy
+                }
+            });
+        });
 
         // Lógica de carrusel
         const carousel = tarjeta.querySelector(".carousel");
-        const images = carousel.querySelectorAll(".carousel-img");
+        const imagesElements = carousel.querySelectorAll(".carousel-img");
         let currentIndex = 0;
 
         const showImage = (index) => {
-            images.forEach((img, i) => {
-                    img.classList.toggle("active", i === index);
+            imagesElements.forEach((img, i) => {
+                img.classList.toggle("active", i === index);
             });
         };
 
@@ -249,25 +332,25 @@ function renderizarArticulos(articulos) {
 
         if (prevBtn && nextBtn) {
             prevBtn.addEventListener("click", function(event) {
+                event.preventDefault();
                 event.stopPropagation(); 
-                currentIndex = (currentIndex - 1 + images.length) % images.length;
+                currentIndex = (currentIndex - 1 + imagesElements.length) % imagesElements.length;
                 showImage(currentIndex);
             });
 
             nextBtn.addEventListener("click", function(event) {
+                event.preventDefault();
                 event.stopPropagation(); 
-                currentIndex = (currentIndex + 1) % images.length;
+                currentIndex = (currentIndex + 1) % imagesElements.length;
                 showImage(currentIndex);
             });
         }
 
-        tarjeta.addEventListener("click", function() {
-          window.location.href = `detalle.html?id=${articulo.id}`;
-        });
-
-        const btnCarrito = tarjeta.querySelector('.añadir-carrito-btn');
-        if ((articulo.cant1 + articulo.cant3) > 0) {
-            btnCarrito.addEventListener("click", function (event) {
+        const btnAccion = tarjeta.querySelector('.añadir-carrito-btn');
+        
+        if (!sinStock) {
+            btnAccion.addEventListener("click", function (event) {
+                event.preventDefault(); 
                 event.stopPropagation();
                 agregarAlCarrito(articulo);
                 openCarrito();
@@ -276,6 +359,32 @@ function renderizarArticulos(articulos) {
 
         contenedor.appendChild(tarjeta);
     });
+}
+
+function iniciarListado(listaDeProductos) {
+    
+    productosGlobales = listaDeProductos;
+    
+    indiceActual = 0;
+    
+    cargarSiguienteTanda(true);
+}
+
+function cargarSiguienteTanda(esInicio = false) {
+    const contenedorBoton = document.getElementById("cargar-mas-container");
+
+    // Corta 20 productos
+    const productosParaMostrar = productosGlobales.slice(indiceActual, indiceActual + POR_PAGINA);
+    
+    renderizarArticulos(productosParaMostrar, esInicio);
+    
+    indiceActual += POR_PAGINA;
+
+    if (indiceActual >= productosGlobales.length) {
+        contenedorBoton.style.display = "none"; // Ya no hay más productos
+    } else {
+        contenedorBoton.style.display = "block"; // Todavía quedan
+    }
 }
 
 function ordenarArticulos() {
@@ -333,7 +442,7 @@ function filtrarProductos(categoria) {
     mensaje.style.display = "none";
   }
 
-  renderizarArticulos(filtrados);
+  iniciarListado(filtrados);
   cerrarTodos();
   const titulo = document.getElementById('mainTitle');
   titulo.innerHTML = `<h1>${categoria}</h1>`;
@@ -350,7 +459,7 @@ function mueblesInterior(){
     mensaje.style.display = "none";
   }
 
-  renderizarArticulos(filtrados);
+  iniciarListado(filtrados);
   cerrarTodos();
   const titulo = document.getElementById('mainTitle');
   titulo.innerHTML = `<h1>MUEBLES INTERIOR</h1>`;
@@ -404,7 +513,7 @@ async function iniciarCompra() {
 
   let response;
   try {
-    response = await fetch("http://localhost:8080/api/articulos/venta", {
+    response = await fetch(API_URL + "/articulos/venta", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -562,7 +671,7 @@ function renderizarCarrito() {
   });
 
   document.getElementById("iniciarCompraBtn").addEventListener("click", () => {
-    window.location.href = "/resumen.html"; 
+    window.location.href = "resumen.html"; 
   });
 
   localStorage.setItem("carrito", JSON.stringify(carrito));
