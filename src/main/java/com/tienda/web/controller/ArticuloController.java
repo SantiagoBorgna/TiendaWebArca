@@ -20,8 +20,6 @@ public class ArticuloController {
 
     private final ArticuloRepository articuloRepository;
     private final VentaService ventaService;
-    // private final ArticuloService articuloService; // Si no lo usas acá, se puede
-    // borrar
 
     public ArticuloController(ArticuloRepository articuloRepository, VentaService ventaService,
             ArticuloService articuloService) {
