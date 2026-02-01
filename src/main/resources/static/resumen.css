@@ -5,6 +5,7 @@ body {
     flex-direction: column;
     min-height: 100vh;
     background-color: white;
+    overflow-y: auto !important;
     overflow-x: hidden;
 }
 
@@ -132,8 +133,11 @@ h2 {
 .img-resumen {
   width: 100px;
   height: 100px;
+  flex-shrink: 0;
   object-fit: cover;
   border-radius: 8px;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
   pointer-events: none; 
   user-select: none; 
   -webkit-user-drag: none;
@@ -305,7 +309,7 @@ h2 {
 }
 
 .boton-carrusel.izquierda {
-  left: -10px; /* Ajustá según necesidad */
+  left: -10px; 
 }
 
 .boton-carrusel.derecha {
@@ -319,11 +323,12 @@ h2 {
 }
 
 .columna-titulo{
-  text-align: center; /* centrado del título */
+  text-align: center;
 }
 
 .envio-section {
-  margin-top: 1rem; /* reducido el margen superior */
+  display: none !important;
+  margin-top: 1rem; 
   padding: 1rem;
   background-color: #f5f5f5;
   border-radius: 8px;
@@ -425,7 +430,7 @@ footer {
 }
 
 .logo {
-    height: 60px; /* opcional, para evitar que se vea muy grande en móvil */
+    height: 60px;
 }
  /* MAIN */
 * {
@@ -471,12 +476,15 @@ main {
 }
 
 .tabla-carrito{
-  padding: 4px;
+    padding: 10px 5px; 
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .encabezado{
-    padding: 12px 0 12px 18px;
-    gap: 10px;
+    /*padding: 12px 0 12px 18px;
+    gap: 10px;*/
+    display: none !important;
 }
 
 .encabezado p{
@@ -499,45 +507,65 @@ main {
   margin-left: 46px;
 }
 
-.fila-carrito .producto {
+/*.fila-carrito .producto {
   display: flex;
   flex-direction: column; 
   align-items: center;
   text-align: center;
   width: 80px; 
-}
+}*/
 
-.img-resumen {
+/*.img-resumen {
   width: 80px;
   height: 80px;
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 5px;
+}*/
+
+.img-resumen {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-bottom: 3px;
 }
 
-.nombre {
+/*.nombre {
   font-size: 0.9rem;
   font-weight: 500;
   word-break: break-word;
   margin: 0;
+}*/
+
+.nombre {
+    font-size: 13px; 
+    line-height: 1.2;
+    width: 100%;
+    word-break: break-word;
+    margin: 0;
 }
 
-.subtotal p{
+/*.subtotal p{
   font-size: 14px;
+}*/
+
+.subtotal p {
+    font-size: 13px;
+    margin: 0;
 }
 
-.fila-carrito .col {
-  width: 90px;  /* Podés ajustar este valor si querés más o menos espacio */
+/*.fila-carrito .col {
+  width: 90px;
   text-align: center;
   flex-shrink: 0;
   margin-left: 10px;
-}
+}*/
 
-.fila-carrito .subtotal {
+/*.fila-carrito .subtotal {
   display: flex;
   align-items: center;
   justify-content: center;
-}
+}*/
 
 .cantidad-control {
   display: flex;
@@ -546,29 +574,106 @@ main {
   gap: 0;
 }
 
-.cantidad-control span{
+/*.cantidad-control span{
   font-size: 14px;
+}*/
+
+.cantidad-control span {
+    font-size: 13px;
+    margin: 0 5px;
+    width: 20px; 
 }
 
-.cantidad-control button {
+/*.cantidad-control button {
   padding: 2px 6px;
   font-size: 1rem;
+}*/
+
+.cantidad-control button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
 }
 
-.icono-trash {
+/*.icono-trash {
   width: 20px;
   height: 20px;
   cursor: pointer;
-  margin-right: 70px;
+  margin-right: 0;
+}*/
+
+.icono-trash {
+    position: absolute; 
+    right: 0;
+    top: 50%; 
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    z-index: 10;
+    cursor: pointer;
 }
 
-.fila-carrito {
+/*.fila-carrito {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
   padding: 10px 0;
   border-bottom: 1px solid #ccc;
+}*/
+
+.fila-carrito {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative; 
+    width: 100%;
+    padding: 15px 0; 
+    box-sizing: border-box;
+    gap: 5px;
+}
+
+.fila-carrito .col {
+    width: auto;
+    flex: 1;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fila-carrito .producto {
+    width: 70px; 
+    flex-shrink: 0; 
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    text-align: center;
+    margin-right: 5px;
+}
+
+.fila-carrito .cantidad {
+    flex: 0 0 auto; 
+    width: auto;
+    margin-right: 15px; 
+    margin-left: 15px; 
+    display: flex;
+    justify-content: center;
+}
+
+.fila-carrito .subtotal {
+    flex: 1; 
+    text-align: left; 
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.fila-carrito .subtotal p {
+    white-space: nowrap; 
+    font-size: 14px;
+    margin: 0;
 }
 
 /* PRODUCTOS RECOMENDADOS */

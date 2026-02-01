@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.getElementById("btn-continuar").addEventListener("click", () => {
-    iniciarCompra();
+    //iniciarCompra();
 });
 
 /* ACTUALIZAR TOTAL SEGUN ENVIO */
