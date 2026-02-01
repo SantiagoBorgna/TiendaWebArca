@@ -1661,3 +1661,24 @@ body {
 }
 
 }
+
+/* PARCHE  PARA IOS */
+
+/* Forzar color */
+input, 
+textarea, 
+select, 
+button {
+    color: #333333 !important; 
+    -webkit-text-fill-color: #333333 !important;
+    opacity: 1 !important; 
+}
+
+select {
+    background-color: #ffffff !important; 
+}
+
+a[href^="tel"] {
+    color: inherit;
+    text-decoration: none;
+}

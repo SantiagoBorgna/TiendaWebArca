@@ -412,7 +412,7 @@ function mayus(str) {
 }
 
 function irAInicio() {
-    window.location.href = "index.html";
+    window.location.href = "/";
 }
   
 async function iniciarCompra() {
