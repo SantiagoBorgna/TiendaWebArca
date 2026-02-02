@@ -958,6 +958,7 @@ footer {
 }
 
 .miniaturas img {
+    pointer-events: auto !important;
     width: 120px; 
     height: 120px;
     object-fit: cover;

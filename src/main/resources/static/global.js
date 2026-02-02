@@ -19,3 +19,9 @@ document.addEventListener("dragstart", function (e) {
         e.preventDefault();
     }
 });
+
+// Cambiar la URL visualmente
+function actualizarURL(ruta) {
+    const nuevaURL = window.location.protocol + "//" + window.location.host + "/" + ruta.toLowerCase().replace(/\s/g, '-');
+    window.history.pushState({path: nuevaURL}, '', nuevaURL);
+}

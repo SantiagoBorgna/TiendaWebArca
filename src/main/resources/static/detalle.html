@@ -8,20 +8,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="icon" href="./images/logo-arca.png" type="image/png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/images/logo-arca.png" type="image/png">
+    <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
-    <script src="global.js"></script>
-    <script defer src="detalle.js"></script>
+    <script src="/global.js"></script> 
+    <script src="/common.js"></script> 
+    <script defer src="/detalle.js"></script>
 </head>
 <body>
     <header>
         <nav id="navbar" class="navbar">
             <div class="navbar-left"><button class="menu-btn" onclick="toggleMenu()">☰</button></div>
             
-            <div class="navbar-center"><a href="/" id="logo" onclick="mostrarTodos()"><img src="./images/logo-arca.png" alt="Logo" class="logo"></a></div>
+            <div class="navbar-center"><a href="/" id="logo" onclick="mostrarTodos()"><img src="/images/logo-arca.png" alt="Logo" class="logo"></a></div>
         
-            <div class="navbar-right"><button class="cart-btn" onclick="openCarrito()"><img src="./images/shopping-bag.png" alt="carrito"></button></div>
+            <div class="navbar-right"><button class="cart-btn" onclick="openCarrito()"><img src="/images/shopping-bag.png" alt="carrito"></button></div>
         </nav>
 
         <div class="overlay" id="overlay" onclick="closeMenu()"></div>
@@ -44,28 +45,29 @@
                 <li class="submenu-toggle">
                     <a href="javascript:void(0)" onclick="toggleSubmenu()">Productos ▾</a>
                     <ul class="submenu" id="submenuProductos">
-                        <li><a href="index.html?categoria=BAZAR">Bazar</a></li>
-                        <li><a href="index.html?categoria=BAÑO">Baño</a></li>
-                        <li><a href="index.html?categoria=DECORACIÓN">Decoración</a></li>
-                        <li><a href="index.html?categoria=TEXTIL">Textil</a></li>
+                        <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BAZAR')">Bazar</a></li>
+                        <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BAÑO')">Baño</a></li>
+                        <li><a href="#" onclick="event.preventDefault(); filtrarProductos('DECORACIÓN')">Decoración</a></li>
+                        <li><a href="#" onclick="event.preventDefault(); filtrarProductos('TEXTIL')">Textil</a></li>
+
                         <li class="submenu-toggle">
                             <a href="javascript:void(0)" onclick="toggleSubmenu2()">Muebles interior ▾</a>
                             <ul class="submenu-muebles" id="submenuMuebles">
-                                <li><a href="index.html?categoria=INTERIOR">Todos</a></li>
-                                <li><a href="index.html?categoria=SILLONES">Sillones</a></li>
-                                <li><a href="index.html?categoria=BANQUETAS">Banquetas</a></li>
-                                <li><a href="index.html?categoria=SILLAS">Sillas</a></li>
-                                <li><a href="index.html?categoria=MESAS">Mesas</a></li>
-                                <li><a href="index.html?categoria=OFICINA">Oficina</a></li>
-                                <li><a href="index.html?categoria=MESAS RATONAS">Mesas ratonas</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); mueblesInterior()">Todos los productos</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('SILLONES')">Sillones</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BANQUETAS')">Banquetas</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('SILLAS')">Sillas</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MESAS')">Mesas</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('OFICINA')">Oficina</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MESAS RATONAS')">Mesas ratonas</a></li>
                             </ul>
                         </li>
-                        <li><a href="#" onclick="filtrarProductos('MUEBLES EXTERIOR')">Muebles exterior</a></li>
+                        <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MUEBLES EXTERIOR')">Muebles exterior</a></li>
                     </ul>
                 </li>
                 <li><a href="#" onclick="openMenuInfo()">¿Quiénes somos?</a></li>
                 <li><a href="#" onclick="openMenuInstrucciones()">¿Cómo comprar?</a></li>
-                <li><a href="#footer" onclick="closeMenu()">Contacto</a></li>
+                <li><a href="#" onclick="event.preventDefault(); cerrarTodos(); document.getElementById('footer').scrollIntoView({behavior: 'smooth'});">Contacto</a></li>
                 <li><a href="#" onclick="openMenuPreguntas()">Preguntas Frecuentes</a></li>
             </ul>
         </nav>
@@ -186,33 +188,33 @@
             <h3>Categorías</h3>
             <div class="footer-categories-lists">
                 <ul>
-                    <li><a href="index.html?categoria=BAZAR">Bazar</a></li>
-                    <li><a href="index.html?categoria=BAÑO">Baño</a></li>
-                    <li><a href="index.html?categoria=DECORACIÓN">Decoración</a></li>
-                    <li><a href="index.html?categoria=TEXTIL">Textil</a></li>
-                    <li><a href="index.html?categoria=INTERIOR">Muebles interior</a></li>
-                    <li><a href="index.html?categoria=MUEBLES EXTERIOR">Muebles exterior</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BAZAR')">Bazar</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BAÑO')">Baño</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('DECORACIÓN')">Decoración</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('TEXTIL')">Textil</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); mueblesInterior()">Muebles interior</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MUEBLES EXTERIOR')">Muebles exterior</a></li>
                 </ul>
                 <ul>
-                    <li><a href="index.html?categoria=SILLONES">Sillones</a></li>
-                    <li><a href="index.html?categoria=BANQUETAS">Banquetas</a></li>
-                    <li><a href="index.html?categoria=SILLAS">Sillas</a></li>
-                    <li><a href="index.html?categoria=MESAS">Mesas</a></li>
-                    <li><a href="index.html?categoria=OFICINA">Oficina</a></li>
-                    <li><a href="index.html?categoria=MESAS RATONAS">Mesas ratonas</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('SILLONES')">Sillones</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BANQUETAS')">Banquetas</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('SILLAS')">Sillas</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MESAS')">Mesas</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('OFICINA')">Oficina</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MESAS RATONAS')">Mesas ratonas</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="footer-contact">
             <h3>Contacto</h3>
-            <p><img src="./images/email.png" alt="">elarcahome.deco@gmail.com</p>
-            <p><img src="./images/telephone.png" alt="">+54 9 3572439160</p>
-            <p><a href="https://www.instagram.com/elarca_home?igsh=aDI1NTY1NW4yZmtu" target="_blank">
-                <img src="./images/instagram.png" alt="">Elarca_home</a>
+            <p><img src="/images/email.png" alt="">elarcahome.deco@gmail.com</p>
+            <p><img src="/images/telephone.png" alt="">+54 9 3572439160</p>
+            <p><a href="./https://www.instagram.com/elarca_home?igsh=aDI1NTY1NW4yZmtu" target="_blank">
+                <img src="/images/instagram.png" alt="">Elarca_home</a>
             </p>
             <p><a href="https://maps.app.goo.gl/44jLe2wmCSJZDseK8" target="_blank">
-                <img src="./images/location.png" alt="">Tomás Garzón 1085,<br>Oncativo, Córdoba</a>
+                <img src="/images/location.png" alt="">Tomás Garzón 1085,<br>Oncativo, Córdoba</a>
             </p>
         </div>
 

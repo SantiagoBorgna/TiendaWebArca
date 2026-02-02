@@ -10,7 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="icon" href="./images/logo-arca.png" type="image/png">
     <link rel="stylesheet" href="styles.css">
-    <script src="global.js"></script>
+    <script src="global.js"></script> 
+    <script src="common.js"></script> 
     <script defer src="script.js"></script>
 </head>
 <body>
@@ -43,28 +44,29 @@
                 <li class="submenu-toggle">
                     <a href="javascript:void(0)" onclick="toggleSubmenu()">Productos ▾</a>
                     <ul class="submenu" id="submenuProductos">
-                        <li><a href="?categoria=BAZAR" onclick="filtrarProductos('BAZAR')">Bazar</a></li>
-                        <li><a href="?categoria=BAÑO" onclick="filtrarProductos('BAÑO')">Baño</a></li>
-                        <li><a href="?categoria=DECORACIÓN" onclick="filtrarProductos('DECORACIÓN')">Decoración</a></li>
-                        <li><a href="?categoria=TEXTIL" onclick="filtrarProductos('TEXTIL')">Textil</a></li>
+                        <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BAZAR')">Bazar</a></li>
+                        <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BAÑO')">Baño</a></li>
+                        <li><a href="#" onclick="event.preventDefault(); filtrarProductos('DECORACIÓN')">Decoración</a></li>
+                        <li><a href="#" onclick="event.preventDefault(); filtrarProductos('TEXTIL')">Textil</a></li>
+
                         <li class="submenu-toggle">
                             <a href="javascript:void(0)" onclick="toggleSubmenu2()">Muebles interior ▾</a>
                             <ul class="submenu-muebles" id="submenuMuebles">
-                                <li><a href="?categoria=INTERIOR" onclick="mueblesInterior()">Todos los productos</a></li>
-                                <li><a href="?categoria=SILLONES" onclick="filtrarProductos('SILLONES')">Sillones</a></li>
-                                <li><a href="?categoria=BANQUETAS" onclick="filtrarProductos('BANQUETAS')">Banquetas</a></li>
-                                <li><a href="?categoria=SILLAS" onclick="filtrarProductos('SILLAS')">Sillas</a></li>
-                                <li><a href="?categoria=MESAS" onclick="filtrarProductos('MESAS')">Mesas</a></li>
-                                <li><a href="?categoria=OFICINA" onclick="filtrarProductos('OFICINA')">Oficina</a></li>
-                                <li><a href="?categoria=MESAS RATONAS" onclick="filtrarProductos('MESAS RATONAS')">Mesas ratonas</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); mueblesInterior()">Todos los productos</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('SILLONES')">Sillones</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BANQUETAS')">Banquetas</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('SILLAS')">Sillas</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MESAS')">Mesas</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('OFICINA')">Oficina</a></li>
+                                <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MESAS RATONAS')">Mesas ratonas</a></li>
                             </ul>
                         </li>
-                        <li><a href="?categoria=MUEBLES EXTERIOR" onclick="filtrarProductos('MUEBLES EXTERIOR')">Muebles exterior</a></li>
+                        <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MUEBLES EXTERIOR')">Muebles exterior</a></li>
                     </ul>
                 </li>
                 <li><a href="#" onclick="openMenuInfo()">¿Quiénes somos?</a></li>
                 <li><a href="#" onclick="openMenuInstrucciones()">¿Cómo comprar?</a></li>
-                <li><a href="#footer" onclick="cerrarTodos()">Contacto</a></li>
+                <li><a href="#" onclick="event.preventDefault(); cerrarTodos(); document.getElementById('footer').scrollIntoView({behavior: 'smooth'});">Contacto</a></li>
                 <li><a href="#" onclick="openMenuPreguntas()">Preguntas Frecuentes</a></li>
             </ul>
         </nav>
@@ -213,20 +215,20 @@
             <h3>Categorías</h3>
             <div class="footer-categories-lists">
                 <ul>
-                    <li><a href="?categoria=BAZAR">Bazar</a></li>
-                    <li><a href="?categoria=BAÑO">Baño</a></li>
-                    <li><a href="?categoria=DECORACIÓN">Decoración</a></li>
-                    <li><a href="?categoria=TEXTIL">Textil</a></li>
-                    <li><a href="?categoria=INTERIOR">Muebles interior</a></li>
-                    <li><a href="?categoria=MUEBLES EXTERIOR">Muebles exterior</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BAZAR')">Bazar</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BAÑO')">Baño</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('DECORACIÓN')">Decoración</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('TEXTIL')">Textil</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); mueblesInterior()">Muebles interior</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MUEBLES EXTERIOR')">Muebles exterior</a></li>
                 </ul>
                 <ul>
-                    <li><a href="?categoria=SILLONES">Sillones</a></li>
-                    <li><a href="?categoria=BANQUETAS">Banquetas</a></li>
-                    <li><a href="?categoria=SILLAS">Sillas</a></li>
-                    <li><a href="?categoria=MESAS">Mesas</a></li>
-                    <li><a href="?categoria=OFICINA">Oficina</a></li>
-                    <li><a href="?categoria=MESAS RATONAS">Mesas ratonas</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('SILLONES')">Sillones</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('BANQUETAS')">Banquetas</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('SILLAS')">Sillas</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MESAS')">Mesas</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('OFICINA')">Oficina</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); filtrarProductos('MESAS RATONAS')">Mesas ratonas</a></li>
                 </ul>
             </div>
         </div>
