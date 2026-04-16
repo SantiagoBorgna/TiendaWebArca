@@ -10,8 +10,9 @@
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
         <link rel="icon" href="./images/logo-arca.png" type="image/png">
         <link rel="stylesheet" href="resumen.css" />
-        <script src="global.js"></script>
-        <script defer src="resumen.js"></script>
+        <script src="/global.js"></script>
+        <script src="/common.js"></script> 
+        <script src="/resumen.js"></script>
     </head>
     <body>
         <header>
@@ -60,7 +61,7 @@
 
                     <div class="calculo-envio">
                     <input type="text" id="codigo-postal" placeholder="Tu código postal" />
-                    <button onclick="calcularEnvio()">Calcular</button>
+                    <button onclick="calcularEnvioResumen()">Calcular</button>
                     </div>
 
                     <p id="mensaje-envio"></p>
@@ -77,7 +78,7 @@
                     <h4>Envío</h4>
                     <label>
                         <input type="radio" name="metodo-envio" value="envio-domicilio" checked />
-                        Envío a domicilio <span class="envio-costo" id="costo-envio">$1000</span>
+                        Envío a domicilio <span class="envio-costo" id="costo-envio"></span>
                     </label>
                     </div>
                 </section>
@@ -89,9 +90,12 @@
                         <p>Subtotal: <span id="subtotal-compra">$0,00</span></p>
                         <p>Envío: <span id="subtotal-envio">$0,00</span></p>
                         <hr />
-                        <p class="total-compra"><strong>Total: <span id="total-compra">$0,00</span></strong></p>
-                        <p class="total-compra-trans">O <span id="total-compra-trans">$0,00</span> con Transferencia</p>
+                        <p class="total-compra"><strong>Total: <span id="total-compra"></span></strong></p>
+                        <p class="total-compra-trans">O <span id="total-compra-trans"></span> con Transferencia</p>
                     </div>
+
+                    <p id="mensaje-error-resumen"></p>
+
                     <button class="pagar" id="btn-continuar">Pagar</button>
                 </section>
 

@@ -48,7 +48,7 @@ public class ArticuloController {
     @PostMapping("/venta")
     public ResponseEntity<String> realizarVenta(@RequestBody Venta venta) {
         try {
-            // 1. Validar y Descontar Stock
+            // Validar y Descontar Stock
             if (venta.getItems() != null) {
                 for (ItemVenta item : venta.getItems()) {
                     articuloRepository.findById(item.getId()).ifPresent(articulo -> {
@@ -72,7 +72,7 @@ public class ArticuloController {
                 }
             }
 
-            // 2. Registrar la venta en la base de datos
+            // Registrar la venta en la base de datos
             ventaService.registrarVenta(
                     venta.getSucursalVenta(),
                     venta.getClienteVenta(),

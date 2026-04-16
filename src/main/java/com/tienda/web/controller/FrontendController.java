@@ -10,6 +10,7 @@ public class FrontendController {
     // Redirigen a index.html
     @GetMapping({
             "/",
+            "/todos",
             "/bazar",
             "/bano",
             "/decoracion",
@@ -31,5 +32,15 @@ public class FrontendController {
     @GetMapping("/p/{id}/{nombre}")
     public String detalleProducto(@PathVariable String id, @PathVariable String nombre) {
         return "forward:/detalle.html";
+    }
+
+    @GetMapping("/resumen")
+    public String resumenCompra() {
+        return "forward:/resumen.html";
+    }
+
+    @GetMapping("/pago")
+    public String pagoCompra() {
+        return "forward:/pago.html";
     }
 }

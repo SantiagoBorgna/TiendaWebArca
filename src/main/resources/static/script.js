@@ -4,7 +4,7 @@ let indiceActual = 0;
 const POR_PAGINA = 20;
 
 let articulosCargados = [];
-let carrito = [];
+/*let carrito = [];*/
 
 /* CARGAR ARTICULOS DESDE DB CHEQUEANDO SI HAY QUE APLICAR ALGUN FILTRO */
 document.addEventListener("DOMContentLoaded", () => {
@@ -22,13 +22,15 @@ document.addEventListener("DOMContentLoaded", () => {
             // Orden inicial por defecto: Stock (Popularidad)
             articulosCargados.sort((a, b) => (b.cant1 + b.cant3) - (a.cant1 + a.cant3));
 
-            // LÓGICA DE RUTAS 
+            // Rutas 
             const path = window.location.pathname.replace(/^\/|\/$/g, ''); 
             const params = new URLSearchParams(window.location.search);
             const busqueda = params.get('busqueda');
 
-            if (path && path !== "index.html") {
-                // Categoria limpia
+            if (path === 'todos') {
+                mostrarTodos('TODOS LOS PRODUCTOS');
+                if (typeof actualizarURL === 'function') actualizarURL("todos");
+            } else if (path && path !== "index.html") {
                 // Normaliza el slug a categoría
                 let categoria = path.replace(/-/g, " ").toUpperCase();
 
@@ -83,7 +85,7 @@ document.querySelector('.overlay').addEventListener('click', () => {
 });
 
 // Mostrar imagenes en carrusel
-contenedor.querySelectorAll(".carousel").forEach((carousel) => {
+document.querySelectorAll(".carousel").forEach((carousel) => {
     const images = carousel.querySelectorAll(".carousel-img");
     let current = 0;
   
@@ -391,14 +393,19 @@ function mueblesInterior(){
   window.scrollTo(0, 0);
 }
 
-function mostrarTodos() {
+function mostrarTodos(tituloPersonalizado) {
   const mensaje = document.getElementById("mensaje-vacio");
   mensaje.style.display = "none";
-  renderizarArticulos(articulosCargados);
+  iniciarListado(articulosCargados);
   cerrarTodos();
   const titulo = document.getElementById('mainTitle');
-  titulo.innerHTML = `<h1>PRODUCTOS DESTACADOS</h1>`;
+  const textoTitulo = tituloPersonalizado || "PRODUCTOS DESTACADOS";
+  titulo.innerHTML = `<h1>${textoTitulo}</h1>`;
   titulo.style.display = 'block';
-
+  if(tituloPersonalizado){
+    if (typeof actualizarURL === 'function') actualizarURL("todos");
+  }
   window.scrollTo(0, 0);
 }
+
+window.mostrarTodosScript = mostrarTodos;

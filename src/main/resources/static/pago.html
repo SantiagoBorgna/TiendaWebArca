@@ -8,19 +8,20 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-        <link rel="icon" href="./images/logo arca.png" type="image/png">
+        <link rel="icon" href="/images/logo-arca.png" type="image/png">
         <link rel="stylesheet" href="pago.css" />
-        <script defer src="pago.js"></script>
+        <script src="/global.js"></script> 
+        <script defer src="/pago.js"></script>
     </head>
 <body>
     <header>
         <nav id="navbar" class="navbar">
-            <a href="resumen.html" class="nav-left">
+            <a href="/resumen" class="nav-left">
                 <span class="texto-volver">Volver a la tienda</span>
-                <span class="flecha-volver"><img src="./images/arrow.png" alt="Volver"></span> 
+                <span class="flecha-volver"><img src="/images/arrow.png" alt="Volver"></span> 
             </a>
-            <a href="index.html" id="logo" class="logo-container">
-                <img src="./images/logo arca.png" alt="Logo" class="logo">
+            <a href="/" id="logo" class="logo-container">
+                <img src="/images/logo-arca.png" alt="Logo" class="logo">
             </a>
         </nav>
     </header>
@@ -67,6 +68,12 @@
                 </div>
 
                 <div class="campo">
+                    <label for="dni-envio">DNI</label>
+                    <input type="text" id="dni-envio" placeholder="Sin puntos" required>
+                    <div class="error" id="error-dni-envio"></div>
+                </div>
+
+                <div class="campo">
                     <label for="email-envio">Email</label>
                     <input type="email" id="email-envio" required>
                     <div class="error" id="error-email-envio"></div>
@@ -102,12 +109,6 @@
                 </div>
 
                 <div class="campo">
-                    <label for="entreCalles">Entre calles</label>
-                    <input type="text" id="entreCalles" required>
-                    <div class="error" id="error-entreCalles"></div>
-                </div>
-
-                <div class="campo">
                     <label for="localidad">Localidad</label>
                     <input type="text" id="localidad" required>
                     <div class="error" id="error-localidad"></div>
@@ -118,6 +119,7 @@
                     <select id="provincia" required>
                         <option value="">Seleccioná una provincia</option>
                         <option value="Buenos Aires">Buenos Aires</option>
+                        <option value="CABA">CABA</option>
                         <option value="Catamarca">Catamarca</option>
                         <option value="Chaco">Chaco</option>
                         <option value="Chubut">Chubut</option>
@@ -157,7 +159,7 @@
         </div>
 
         <div class="pantalla-derecha">
-            <img src="./images/tarjetas.jpg" alt="Medios de pago disponibles">
+            <img src="/images/tarjetas.jpg" alt="Medios de pago disponibles">
         </div>
 
     </main>

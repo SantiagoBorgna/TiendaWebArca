@@ -56,8 +56,17 @@ public class Articulo {
     @Column(name = "ciudad_articulo")
     private String ciudadArticulo;
 
-    @Column(name = "id_tienda_nube")
-    private Long idTiendaNube;
+    @Column(name = "peso_articulo")
+    private double pesoArticulo;
+
+    @Column(name = "alto_articulo")
+    private double altoArticulo;
+
+    @Column(name = "ancho_articulo")
+    private double anchoArticulo;
+
+    @Column(name = "profundidad_articulo")
+    private double profundidadArticulo;
 
     // Getters y Setters
     public int getId() {
@@ -188,12 +197,36 @@ public class Articulo {
         this.ciudadArticulo = ciudadArticulo;
     }
 
-    public Long getIdTiendaNube() {
-        return idTiendaNube;
+    public double getPeso() {
+        return pesoArticulo;
     }
 
-    public void setIdTiendaNube(Long idTiendaNube) {
-        this.idTiendaNube = idTiendaNube;
+    public void setPeso(Double pesoArticulo) {
+        this.pesoArticulo = pesoArticulo;
+    }
+
+    public double getAlto() {
+        return altoArticulo;
+    }
+
+    public void setAlto(Double altoArticulo) {
+        this.altoArticulo = altoArticulo;
+    }
+
+    public double getAncho() {
+        return anchoArticulo;
+    }
+
+    public void setAncho(Double anchoArticulo) {
+        this.anchoArticulo = anchoArticulo;
+    }
+
+    public double getProfundidad() {
+        return profundidadArticulo;
+    }
+
+    public void setProfundidad(Double profundidadArticulo) {
+        this.profundidadArticulo = profundidadArticulo;
     }
 
 }

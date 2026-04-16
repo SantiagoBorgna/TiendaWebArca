@@ -1,163 +1,242 @@
-window.addEventListener("DOMContentLoaded", () => {
-  const metodo = localStorage.getItem("metodoEnvio");
+/* Lógica del Formulario y Envío */
 
-  const formRetiro = document.getElementById("form-retiro");
-  const formEnvio = document.getElementById("form-envio");
-
-  const titulo = document.getElementById("title");
-
-  if (metodo === "retiro-local") {
-    formRetiro.style.display = "block";
-    titulo.textContent = "Por favor completá con tus datos para el retiro";
-  } else {
-    titulo.textContent = "Por favor completá con tus datos para que podamos realizar el envío";
-    formEnvio.style.display = "block";
-  }
-
-  document.getElementById("btn-pagar").addEventListener("click", (e) => {
-    e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+    const metodo = localStorage.getItem("metodoEnvio");
+    const formRetiro = document.getElementById("form-retiro");
+    const formEnvio = document.getElementById("form-envio");
+    const titulo = document.getElementById("title");
 
     if (metodo === "retiro-local") {
-      if (validarRetiro()) {
-        window.location.href = "checkout.html"; // o tu URL de pago
-      }
+        formRetiro.style.display = "block";
+        titulo.textContent = "Completá tus datos para el retiro";
+        formEnvio.innerHTML = "";
+        activarValidacionesEnTiempoReal("retiro");
     } else {
-      if (validarEnvio()) {
-        window.location.href = "checkout.html"; // o tu URL de pago
-      }
+        titulo.textContent = "Completá tus datos para el envío";
+        formEnvio.style.display = "block";
+        formRetiro.innerHTML = "";
+        
+        const cpGuardado = localStorage.getItem("codigoPostal");
+        if(cpGuardado) {
+            const inputCP = document.getElementById("codigo-postal-envio");
+            if(inputCP) inputCP.value = cpGuardado;
+        }
+        activarValidacionesEnTiempoReal("envio");
     }
-  });
-});
 
-// Función para validar email
-function validarEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-// Función para validar teléfono (solo números)
-function validarTelefono(telefono) {
-  return /^[0-9]+$/.test(telefono);
-}
-
-// Función genérica para mostrar u ocultar errores
-function mostrarError(inputId, mensaje) {
-  const errorDiv = document.getElementById('error-' + inputId);
-  errorDiv.textContent = mensaje;
-}
-
-// === Validación para Email ===
-document.getElementById('email-retiro').addEventListener('blur', function () {
-  const valor = this.value.trim();
-  if (!validarEmail(valor)) {
-    mostrarError('email-retiro', 'Por favor, ingresá un email válido.');
-  } else {
-    mostrarError('email-retiro', '');
-  }
-});
-
-document.getElementById('email-envio').addEventListener('blur', function () {
-  const valor = this.value.trim();
-  if (!validarEmail(valor)) {
-    mostrarError('email-envio', 'Por favor, ingresá un email válido.');
-  } else {
-    mostrarError('email-envio', '');
-  }
-});
-
-// === Validación para Teléfono ===
-document.getElementById('telefono-retiro').addEventListener('blur', function () {
-  const valor = this.value.trim();
-  if (!validarTelefono(valor)) {
-    mostrarError('telefono-retiro', 'Ingresa un número válido.');
-  } else {
-    mostrarError('telefono-retiro', '');
-  }
-});
-
-document.getElementById('telefono-envio').addEventListener('blur', function () {
-  const valor = this.value.trim();
-  if (!validarTelefono(valor)) {
-    mostrarError('telefono-envio', 'Ingresa un número válido.');
-  } else {
-    mostrarError('telefono-envio', '');
-  }
-});
-
-// Funciones de validación
-function validarRetiro() {
-  let valido = true;
-
-  valido &= validarCampo("nombre-retiro", "error-nombre-retiro", "Ingresá tu nombre y apellido");
-  valido &= validarCampo("dni-retiro", "error-dni-retiro", "Ingresá un DNI válido", /^\d{7,8}$/);
-  valido &= validarCampo("email-retiro", "error-email-retiro", "Ingresá un email válido", /^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-  valido &= validarCampo("telefono-retiro", "error-telefono-retiro", "Ingresá un teléfono válido", /^\d{6,15}$/);
-
-  return !!valido;
-}
-
-function validarEnvio() {
-  let valido = true;
-
-  valido &= validarCampo("nombre-envio", "error-nombre-envio", "Ingresá tu nombre y apellido");
-  valido &= validarCampo("email-envio", "error-email-envio", "Ingresá un email válido", /^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-  valido &= validarCampo("telefono-envio", "error-telefono-envio", "Ingresá un teléfono válido", /^\d{6,15}$/);
-  valido &= validarCampo("calle", "error-calle", "Ingresá el nombre de la calle");
-  valido &= validarCampo("entreCalles", "error-entreCalles", "Ingresá las calles entre las que estás");
-  valido &= validarCampo("localidad", "error-localidad", "Ingresá tu localidad");
-  valido &= validarCampo("provincia", "error-provincia", "Seleccioná una provincia");
-  valido &= validarCampo("codigo-postal-envio", "error-cp", "Ingresá un código postal válido", /^\d{4}$/);
-
-  return !!valido;
-}
-
-function validarCampo(idCampo, idError, mensaje, regex = /.+/) {
-  const campo = document.getElementById(idCampo);
-  const error = document.getElementById(idError);
-
-  if (!campo || !regex.test(campo.value.trim())) {
-    error.textContent = mensaje;
-    return false;
-  } else {
-    error.textContent = "";
-    return true;
-  }
-}
-
-// Guardar datos del formulario
-document.getElementById("btn-pagar").addEventListener("click", function () {
-    let datos = {};
-
-    const metodoEnvio = localStorage.getItem("metodoEnvio"); // 
-
-    if (metodoEnvio === "retiro") {
-        datos = {
-            tipo: "Retiro en local",
-            nombre: document.getElementById("nombre-retiro").value,
-            dni: document.getElementById("dni-retiro").value,
-            email: document.getElementById("email-retiro").value,
-            telefono: document.getElementById("telefono-retiro").value
-        };
-    } else if (metodoEnvio === "envio") {
-        datos = {
-            tipo: "Envío a domicilio",
-            nombre: document.getElementById("nombre-envio").value,
-            email: document.getElementById("email-envio").value,
-            telefono: document.getElementById("telefono-envio").value,
-            direccion: {
-                calle: document.getElementById("calle").value,
-                altura: document.getElementById("altura").value,
-                piso: document.getElementById("piso").value,
-                dpto: document.getElementById("dpto").value,
-                entreCalles: document.getElementById("entreCalles").value,
-                localidad: document.getElementById("localidad").value,
-                provincia: document.getElementById("provincia").value,
-                codigoPostal: document.getElementById("codigo-postal-envio").value
+    const btnPagar = document.getElementById("btn-pagar");
+    if(btnPagar){
+        btnPagar.addEventListener("click", async (e) => {
+            e.preventDefault();
+            
+            // Valida Forms
+            let esValido = false;
+            if (metodo === "retiro-local") {
+                esValido = validarFormularioRetiro();
+            } else {
+                esValido = validarFormularioEnvio();
             }
-        };
-    }
 
-    localStorage.setItem("datosCliente", JSON.stringify(datos));
-    
-    // Luego redirige a la página de pago o confirma con MercadoPago
-    //window.location.href = "mercado_pago.html"; // o como se llame tu página de confirmación
+            if (!esValido) {
+                alert("Por favor corregí los campos en rojo.");
+                return;
+            }
+
+            await enviarPedidoAlBackend(metodo);
+        });
+    }
 });
+
+/* Validación */
+const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+const REGEX_DNI = /^\d{7,8}$/;
+const REGEX_TEL = /^\d{10,15}$/; 
+const REGEX_TEXTO = /.+/; 
+
+function validarCampo(idInput, idError, regex, mensajeError) {
+    const input = document.getElementById(idInput);
+    const errorDiv = document.getElementById(idError);
+    
+    if (!input) return true;
+
+    const valor = input.value.trim();
+
+    if (!regex.test(valor)) {
+        if(errorDiv) errorDiv.textContent = mensajeError;
+        input.style.borderColor = "red";
+        input.style.backgroundColor = "#fff0f0";
+        return false;
+    } else {
+        if(errorDiv) errorDiv.textContent = "";
+        input.style.borderColor = "#ccc";
+        input.style.backgroundColor = "#fff";
+        return true;
+    }
+}
+
+function validarFormularioRetiro() {
+    let v = true;
+    v &= validarCampo("nombre-retiro", "error-nombre-retiro", REGEX_TEXTO, "Ingresá nombre y apellido.");
+    v &= validarCampo("dni-retiro", "error-dni-retiro", REGEX_DNI, "DNI inválido (solo números).");
+    v &= validarCampo("email-retiro", "error-email-retiro", REGEX_EMAIL, "Ingresá un email válido.");
+    v &= validarCampo("telefono-retiro", "error-telefono-retiro", REGEX_TEL, "Teléfono inválido (solo números).");
+    return !!v;
+}
+
+function validarFormularioEnvio() {
+    let v = true;
+    v &= validarCampo("nombre-envio", "error-nombre-envio", REGEX_TEXTO, "Ingresá nombre y apellido.");
+    v &= validarCampo("dni-envio", "error-dni-envio", REGEX_DNI, "DNI inválido (solo números).");
+    v &= validarCampo("email-envio", "error-email-envio", REGEX_EMAIL, "Ingresá un email válido.");
+    v &= validarCampo("telefono-envio", "error-telefono-envio", REGEX_TEL, "Teléfono inválido (solo números).");
+    
+    v &= validarCampo("calle", "error-calle", REGEX_TEXTO, "Falta la calle.");
+    v &= validarCampo("localidad", "error-localidad", REGEX_TEXTO, "Falta la localidad.");
+    v &= validarCampo("provincia", "error-provincia", REGEX_TEXTO, "Seleccioná una provincia.");
+    v &= validarCampo("codigo-postal-envio", "error-cp", /^\d{4,5}$/, "CP inválido.");
+    
+    return !!v;
+}
+
+function activarValidacionesEnTiempoReal(tipo) {
+    if (tipo === "retiro") {
+        document.getElementById("nombre-retiro")?.addEventListener("blur", () => validarCampo("nombre-retiro", "error-nombre-retiro", REGEX_TEXTO, "Ingresá nombre."));
+        document.getElementById("dni-retiro")?.addEventListener("blur", () => validarCampo("dni-retiro", "error-dni-retiro", REGEX_DNI, "DNI solo números."));
+        document.getElementById("email-retiro")?.addEventListener("blur", () => validarCampo("email-retiro", "error-email-retiro", REGEX_EMAIL, "Email inválido."));
+        document.getElementById("telefono-retiro")?.addEventListener("blur", () => validarCampo("telefono-retiro", "error-telefono-retiro", REGEX_TEL, "Solo números."));
+    } else {
+        document.getElementById("nombre-envio")?.addEventListener("blur", () => validarCampo("nombre-envio", "error-nombre-envio", REGEX_TEXTO, "Ingresá nombre."));
+        document.getElementById("dni-envio")?.addEventListener("blur", () => validarCampo("dni-envio", "error-dni-envio", REGEX_DNI, "DNI solo números."));
+        document.getElementById("email-envio")?.addEventListener("blur", () => validarCampo("email-envio", "error-email-envio", REGEX_EMAIL, "Email inválido."));
+        document.getElementById("telefono-envio")?.addEventListener("blur", () => validarCampo("telefono-envio", "error-telefono-envio", REGEX_TEL, "Solo números."));
+        document.getElementById("codigo-postal-envio")?.addEventListener("blur", () => validarCampo("codigo-postal-envio", "error-cp", /^\d{4,5}$/, "CP incorrecto."));
+    }
+}
+
+/* ENVÍO AL BACKEND */
+async function enviarPedidoAlBackend(metodo) {
+    const btn = document.getElementById("btn-pagar");
+    const textoOriginal = btn.textContent;
+    btn.textContent = "Procesando...";
+    btn.disabled = true;
+    let nombreMetodoEnvio = "";
+
+    try {
+        const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+        const costoEnvio = parseFloat(localStorage.getItem("precioEnvio")) || 0;
+        
+        // Calcula Totales
+        let totalProductos = 0;
+        const itemsDto = carrito.map(item => {
+            totalProductos += item.precioVenta * item.cantidad;
+            return {
+                id: item.id,
+                nombre: item.nombre,
+                cantidad: item.cantidad,
+                precio: item.precioVenta
+            };
+        });
+
+        let datosForm = {};
+
+        if (metodo === "retiro-local") {
+            const nombreCompleto = document.getElementById("nombre-retiro").value;
+            const partesNombre = separarNombre(nombreCompleto);
+            nombreMetodoEnvio = "Retiro en local";
+
+            datosForm = {
+                nombre: partesNombre.nombre,
+                apellido: partesNombre.apellido,
+                dni: document.getElementById("dni-retiro").value,
+                email: document.getElementById("email-retiro").value,
+                telefono: document.getElementById("telefono-retiro").value,
+
+                pisoDepto: "-",
+                calle: "Retiro en Local", 
+                numero: "-", 
+                ciudad: "Oncativo", 
+                provincia: "Córdoba", 
+                cp: "5986"
+            };
+        } else {
+            const nombreCompleto = document.getElementById("nombre-envio").value;
+            const partesNombre = separarNombre(nombreCompleto);
+            
+            const transportistaGuardado = localStorage.getItem("nombreTransportista");
+            nombreMetodoEnvio = transportistaGuardado || "Envío a domicilio";
+
+            const calleVal = document.getElementById("calle").value;
+            const alturaVal = document.getElementById("altura").value || "S/N";
+            const pisoVal = document.getElementById("piso").value;
+            const dptoVal = document.getElementById("dpto").value;
+            
+            const pisoDeptoStr = (pisoVal + " " + dptoVal).trim();
+
+            datosForm = {
+                nombre: partesNombre.nombre,
+                apellido: partesNombre.apellido,
+                dni: document.getElementById("dni-envio").value,
+                email: document.getElementById("email-envio").value,
+                telefono: document.getElementById("telefono-envio").value,
+                
+                calle: calleVal,
+                numero: alturaVal,
+                pisoDepto: pisoDeptoStr, 
+                ciudad: document.getElementById("localidad").value,
+                provincia: document.getElementById("provincia").value,
+                cp: document.getElementById("codigo-postal-envio").value
+            };
+        }
+
+        // Armar el objeto final
+        const pedidoData = {
+            ...datosForm,
+            metodoEnvio: nombreMetodoEnvio,
+            costoEnvio: costoEnvio,
+            totalProductos: totalProductos,
+            totalFinal: totalProductos + costoEnvio,
+            items: itemsDto
+        };
+
+        // FETCH AL BACKEND
+        const url = (typeof API_URL !== 'undefined' ? API_URL : "http://localhost:8080/api") + "/pedidos/crear";
+        
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(pedidoData)
+        });
+
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        console.log("Éxito:", await response.text());
+
+        // ÉXITO
+        alert("¡Pedido realizado con éxito!");
+        localStorage.setItem("carrito", "[]");
+        localStorage.removeItem("precioEnvio");
+        localStorage.removeItem("metodoEnvio");
+        localStorage.removeItem("nombreTransportista");
+        localStorage.removeItem("costoEnvioCalculado");
+        
+        window.location.href = "/"; 
+
+    } catch (error) {
+        // ERROR
+        console.error("Error:", error);
+        alert("Hubo un error al procesar el pedido: " + error.message);
+        btn.textContent = textoOriginal;
+        btn.disabled = false;
+    }
+}
+
+function separarNombre(nombreCompleto) {
+    const partes = nombreCompleto.trim().split(" ");
+    if (partes.length === 1) return { nombre: partes[0], apellido: "" };
+    
+    const apellido = partes.pop(); 
+    const nombre = partes.join(" "); 
+    return { nombre, apellido };
+}

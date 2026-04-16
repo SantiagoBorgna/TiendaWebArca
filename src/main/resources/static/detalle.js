@@ -180,13 +180,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const miniaturas = contenedor.querySelectorAll(".miniatura");
             const imagenPrincipal = contenedor.querySelector("#imagen-principal");
 
-            console.log("Miniaturas encontradas:", miniaturas.length);
-            console.log("Imagen Principal encontrada:", imagenPrincipal);
-
             if(miniaturas.length > 0 && imagenPrincipal) {
                 miniaturas.forEach(miniatura => {
                     const actualizarImagen = () => {
-                        console.log("Cambiando imagen a:", miniatura.src); 
                         imagenPrincipal.src = miniatura.src;
                     };
 

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error en el Pago | El Arca Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { display: flex; flex-direction: column; min-height: 100vh; text-align: center; }
+        .mensaje-container {
+            margin: auto;
+            padding: 40px;
+            max-width: 500px;
+        }
+        .icono-fallo {
+            color: #dc3545; /* Rojo error */
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        h1 { margin-bottom: 20px; color: #333; }
+        p { font-size: 1.1rem; color: #666; margin-bottom: 30px; }
+        .btn-reintentar {
+            background-color: black;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mensaje-container">
+        <div class="icono-fallo">✕</div>
+        <h1>Hubo un problema</h1>
+        <p>No pudimos procesar tu pago. Puede que se haya rechazado la tarjeta o cancelaste la operación.</p>
+        
+        <a href="resumen.html" class="btn-reintentar">INTENTAR NUEVAMENTE</a>
+    </div>
+
+</body>
+</html>
