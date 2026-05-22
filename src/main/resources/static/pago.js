@@ -242,6 +242,8 @@ async function enviarPedidoAlBackend(metodo) {
             oid: data.idPedido // El ID de tu base de datos
         };
 
+        console.log("Creando formulario con estos datos:", inputs);
+
         // Creamos los inputs invisibles y los agregamos al formulario
         for (const key in inputs) {
             const input = document.createElement("input");
