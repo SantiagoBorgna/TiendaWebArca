@@ -1,5 +1,6 @@
 package com.tienda.web.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -7,8 +8,11 @@ import java.util.Formatter;
 
 @Service
 public class PaymentService {
-    private final String STORE_ID = "TU_STORE_ID_AQUI";
-    private final String SHARED_SECRET = "TU_SHARED_SECRET_AQUI";
+    @Value("${STORE_ID}")
+    private String storeId;
+
+    @Value("${SHARED_SECRET}")
+    private String sharedSecret;
 
     // Moneda: 032 es el código numérico para Pesos Argentinos (ARS)
     private final String CURRENCY = "032";
@@ -21,7 +25,7 @@ public class PaymentService {
     public String crearHash(String montoTotal, String fechaHora) {
         try {
             // 1. Armamos la cadena de texto exacta que pide Fiserv
-            String cadenaAEnciptar = STORE_ID + fechaHora + montoTotal + CURRENCY + SHARED_SECRET;
+            String cadenaAEnciptar = storeId + fechaHora + montoTotal + CURRENCY + sharedSecret;
 
             System.out.println("🔒 Generando Hash para: " + cadenaAEnciptar); // Para depurar
 
@@ -47,7 +51,7 @@ public class PaymentService {
     }
 
     public String getStoreId() {
-        return STORE_ID;
+        return storeId;
     }
 
     public String getCurrency() {

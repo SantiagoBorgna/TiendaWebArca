@@ -211,11 +211,8 @@ async function enviarPedidoAlBackend(metodo) {
             throw new Error(await response.text());
         }
 
-        console.log("Éxito:", await response.text());
-
         // 1. Recibimos la respuesta completa del backend (el JSON con el Hash y los datos)
         const data = await response.json(); 
-        console.log("Éxito. Redirigiendo a Fiserv...", data);
 
         // 2. Limpiamos el carrito porque el pedido ya está guardado en tu Base de Datos
         localStorage.setItem("carrito", "[]");
