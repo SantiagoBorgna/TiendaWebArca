@@ -213,15 +213,47 @@ async function enviarPedidoAlBackend(metodo) {
 
         console.log("Éxito:", await response.text());
 
-        // ÉXITO
-        alert("¡Pedido realizado con éxito!");
+        // 1. Recibimos la respuesta completa del backend (el JSON con el Hash y los datos)
+        const data = await response.json(); 
+        console.log("Éxito. Redirigiendo a Fiserv...", data);
+
+        // 2. Limpiamos el carrito porque el pedido ya está guardado en tu Base de Datos
         localStorage.setItem("carrito", "[]");
         localStorage.removeItem("precioEnvio");
         localStorage.removeItem("metodoEnvio");
         localStorage.removeItem("nombreTransportista");
         localStorage.removeItem("costoEnvioCalculado");
-        
-        window.location.href = "/"; 
+
+        // 3. CREAMOS EL FORMULARIO OCULTO PARA FISERV
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = data.urlFiserv;
+
+        // Estos son los campos obligatorios que Fiserv necesita para identificar la compra
+        const inputs = {
+            storename: data.storename,
+            txndatetime: data.txndatetime,
+            chargetotal: data.chargetotal,
+            currency: data.currency,
+            hash_algorithm: "SHA256",
+            hash: data.hash,
+            txntype: "sale",
+            timezone: "America/Argentina/Buenos_Aires",
+            oid: data.idPedido // El ID de tu base de datos
+        };
+
+        // Creamos los inputs invisibles y los agregamos al formulario
+        for (const key in inputs) {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = inputs[key];
+            form.appendChild(input);
+        }
+
+        // Agregamos el formulario al documento y lo enviamos automáticamente
+        document.body.appendChild(form);
+        form.submit(); 
 
     } catch (error) {
         // ERROR

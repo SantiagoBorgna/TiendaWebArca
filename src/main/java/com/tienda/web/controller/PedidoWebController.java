@@ -6,11 +6,16 @@ import com.tienda.web.model.Articulo;
 import com.tienda.web.model.PedidoWeb;
 import com.tienda.web.repository.ArticuloRepository;
 import com.tienda.web.repository.PedidoWebRepository;
+import com.tienda.web.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -22,6 +27,9 @@ public class PedidoWebController {
 
     @Autowired
     private ArticuloRepository articuloRepository;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @PostMapping("/crear")
     @Transactional
@@ -83,7 +91,22 @@ public class PedidoWebController {
 
             pedidoRepository.save(pedido);
 
-            return ResponseEntity.ok("Pedido creado con ID: " + pedido.getId());
+            // PREPARAMOS LOS DATOS PARA FISERV
+            String montoFormateado = String.format("%.2f", pedido.getTotalFinal()).replace(",", ".");
+            String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy:MM:dd-HH:mm:ss"));
+            String hash = paymentService.crearHash(montoFormateado, fechaHora);
+
+            // RESPONDEMOS AL FRONTEND CON EL JSON COMPLETO
+            Map<String, Object> respuesta = new HashMap<>();
+            respuesta.put("idPedido", pedido.getId());
+            respuesta.put("storename", paymentService.getStoreId());
+            respuesta.put("currency", paymentService.getCurrency());
+            respuesta.put("txndatetime", fechaHora);
+            respuesta.put("chargetotal", montoFormateado);
+            respuesta.put("hash", hash);
+            respuesta.put("urlFiserv", "https://test.ipg-online.com/connect/gateway/processing");
+
+            return ResponseEntity.ok(respuesta);
 
         } catch (Exception e) {
             e.printStackTrace();

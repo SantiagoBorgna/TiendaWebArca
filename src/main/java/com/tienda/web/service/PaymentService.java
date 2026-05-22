@@ -7,11 +7,6 @@ import java.util.Formatter;
 
 @Service
 public class PaymentService {
-
-    // ⚠️ IMPORTANTE: Estos datos luego los moveremos a application.properties por
-    // seguridad
-    // Por ahora ponelos acá para probar (Si tenés los reales, reemplazalos entre
-    // las comillas)
     private final String STORE_ID = "TU_STORE_ID_AQUI";
     private final String SHARED_SECRET = "TU_SHARED_SECRET_AQUI";
 
