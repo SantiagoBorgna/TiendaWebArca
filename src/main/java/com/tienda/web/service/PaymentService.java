@@ -57,4 +57,8 @@ public class PaymentService {
     public String getCurrency() {
         return CURRENCY;
     }
+
+    public String getSharedSecret() {
+        return sharedSecret;
+    }
 }

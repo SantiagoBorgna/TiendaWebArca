@@ -48,6 +48,16 @@ public class PaymentController {
         // URL TEST: https://test.ipg-online.com/connect/gateway/processing
         respuesta.put("urlFiserv", "https://test.ipg-online.com/connect/gateway/processing");
 
+        // ... (tu código armando el Map respuesta) ...
+
+        // ESPÍA SEGURO PARA LOS LOGS DE RAILWAY
+        System.out.println("===== DEBUG PAGO =====");
+        System.out.println("Store ID inyectado: " + paymentService.getStoreId());
+        System.out.println("Largo del Shared Secret: " +
+                (paymentService.getSharedSecret() != null ? paymentService.getSharedSecret().length() : "ES NULO!"));
+        System.out.println("JSON a devolver al front: " + respuesta.toString());
+        System.out.println("======================");
+
         return ResponseEntity.ok(respuesta);
     }
 }
