@@ -48,8 +48,6 @@ public class PaymentController {
         // URL TEST: https://test.ipg-online.com/connect/gateway/processing
         respuesta.put("urlFiserv", "https://test.ipg-online.com/connect/gateway/processing");
 
-        // ... (tu código armando el Map respuesta) ...
-
         // ESPÍA SEGURO PARA LOS LOGS DE RAILWAY
         System.out.println("===== DEBUG PAGO =====");
         System.out.println("Store ID inyectado: " + paymentService.getStoreId());
