@@ -27,7 +27,7 @@ public class PaymentService {
             SecretKeySpec secret_key = new SecretKeySpec(sharedSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
             sha256_HMAC.init(secret_key);
             byte[] hashBytes = sha256_HMAC.doFinal(cadenaAEnciptar.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(hashBytes);
+            return bytesToHex(hashBytes);
         } catch (Exception e) {
             throw new RuntimeException("Error HMAC", e);
         }
@@ -56,8 +56,8 @@ public class PaymentService {
             
             byte[] hashBytes = sha256_HMAC.doFinal(cadenaAEnciptar.getBytes(StandardCharsets.UTF_8));
 
-            // Para Hash Extendido, Fiserv exige la firma en Base64
-            return Base64.getEncoder().encodeToString(hashBytes);
+            // Para Telecash / Fiserv Argentina, el HMAC-SHA256 suele requerirse en HEXADECIMAL (minúscula).
+            return bytesToHex(hashBytes);
 
         } catch (Exception e) {
             throw new RuntimeException("Error al generar el hash extendido de pago HMAC", e);
