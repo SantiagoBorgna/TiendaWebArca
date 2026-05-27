@@ -38,7 +38,7 @@ public class PaymentController {
 
         // 4. Preparamos la respuesta para la web
         Map<String, String> respuesta = new HashMap<>();
-        respuesta.put("storeId", paymentService.getStoreId());
+        respuesta.put("storename", paymentService.getStoreId());
         respuesta.put("currency", paymentService.getCurrency());
         respuesta.put("txndatetime", fechaHora);
         respuesta.put("chargetotal", montoFormateado);
