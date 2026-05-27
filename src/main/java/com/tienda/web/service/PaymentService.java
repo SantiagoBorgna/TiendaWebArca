@@ -37,16 +37,17 @@ public class PaymentService {
         try {
             // Documentación Fiserv: Hash Extendido HMAC-SHA256. 
             // Se deben ordenar los NOMBRES de los parámetros a enviar alfabéticamente:
-            // chargetotal, checkoutoption, currency, hash_algorithm, responseFailURL, responseSuccessURL, storename, timezone, txndatetime
+            // chargetotal, checkoutoption, currency, hash_algorithm, responseFailURL, responseSuccessURL, storename, timezone, txndatetime, txntype
             
             String responseFailURL = "https://elarcahome.com.ar/fallo";
             String responseSuccessURL = "https://elarcahome.com.ar/exito";
             String hashAlgorithm = "HMACSHA256";
             String timezone = "America/Buenos_Aires";
             String checkoutoption = "combinedpage";
+            String txntype = "sale";
             
             // Se concatenan sus VALORES separados por | respetando el orden alfabético de sus claves
-            String cadenaAEnciptar = montoTotal + "|" + checkoutoption + "|" + CURRENCY + "|" + hashAlgorithm + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + timezone + "|" + fechaHora;
+            String cadenaAEnciptar = montoTotal + "|" + checkoutoption + "|" + CURRENCY + "|" + hashAlgorithm + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + timezone + "|" + fechaHora + "|" + txntype;
 
             System.out.println("🔒 Generando HMAC Hash Extendido para: " + cadenaAEnciptar);
 
@@ -56,8 +57,8 @@ public class PaymentService {
             
             byte[] hashBytes = sha256_HMAC.doFinal(cadenaAEnciptar.getBytes(StandardCharsets.UTF_8));
 
-            // Para Telecash / Fiserv Argentina, el HMAC-SHA256 suele requerirse en HEXADECIMAL (minúscula).
-            return bytesToHex(hashBytes);
+            // Soporte Fiserv confirmó: Base64
+            return Base64.getEncoder().encodeToString(hashBytes);
 
         } catch (Exception e) {
             throw new RuntimeException("Error al generar el hash extendido de pago HMAC", e);

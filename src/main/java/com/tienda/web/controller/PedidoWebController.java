@@ -112,6 +112,7 @@ public class PedidoWebController {
             respuesta.put("hash_algorithm", "HMACSHA256");
             respuesta.put("timezone", "America/Buenos_Aires");
             respuesta.put("checkoutoption", "combinedpage");
+            respuesta.put("txntype", "sale");
 
             // ESPÍA SEGURO PARA LOS LOGS DE RAILWAY
             System.out.println("===== DEBUG PAGO =====");
