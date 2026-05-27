@@ -110,6 +110,8 @@ public class PedidoWebController {
             respuesta.put("responseSuccessURL", "https://elarcahome.com.ar/exito");
             respuesta.put("responseFailURL", "https://elarcahome.com.ar/fallo");
             respuesta.put("hash_algorithm", "HMACSHA256");
+            respuesta.put("timezone", "America/Buenos_Aires");
+            respuesta.put("checkoutoption", "combinedpage");
 
             // ESPÍA SEGURO PARA LOS LOGS DE RAILWAY
             System.out.println("===== DEBUG PAGO =====");

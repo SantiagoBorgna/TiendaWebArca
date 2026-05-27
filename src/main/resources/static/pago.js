@@ -235,7 +235,9 @@ async function enviarPedidoAlBackend(metodo) {
             hashExtended: data.hashExtended,
             hash_algorithm: data.hash_algorithm,
             responseSuccessURL: data.responseSuccessURL,
-            responseFailURL: data.responseFailURL
+            responseFailURL: data.responseFailURL,
+            timezone: data.timezone,
+            checkoutoption: data.checkoutoption
         };
 
         console.log("Creando formulario con estos datos:", inputs);
