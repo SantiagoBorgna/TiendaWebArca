@@ -5,48 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>¡Compra Exitosa! | El Arca Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css"> <style>
-        body { display: flex; flex-direction: column; min-height: 100vh; text-align: center; }
+    <link rel="icon" href="/images/logo-arca.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+            text-align: center;
+            background-color: #fafafa;
+        }
+        .navbar {
+            display: flex;
+            justify-content: center;
+            padding: 1rem 2rem;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .logo { height: 60px; }
         .mensaje-container {
             margin: auto;
-            padding: 40px;
-            max-width: 500px;
+            padding: 50px 40px;
+            max-width: 550px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            margin-top: 60px;
         }
         .icono-exito {
-            color: #28a745; /* Verde éxito */
+            color: #2e7d32;
             font-size: 80px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            animation: fadeInScale 0.6s ease-out;
         }
-        h1 { margin-bottom: 20px; color: #333; }
-        p { font-size: 1.1rem; color: #666; margin-bottom: 30px; }
+        @keyframes fadeInScale {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        h1 { margin-bottom: 20px; color: #1a1a1a; font-weight: 700; font-family: 'Montserrat', sans-serif;}
+        p { font-size: 1.1rem; color: #555; margin-bottom: 35px; line-height: 1.6;}
         .btn-volver {
-            background-color: black;
+            display: inline-block;
+            background-color: #1a1a1a;
             color: white;
-            padding: 15px 30px;
+            padding: 16px 36px;
             text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: 0.3s;
+            border-radius: 8px;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .btn-volver:hover { background-color: #333; }
+        .btn-volver:hover { 
+            background-color: #333; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
     </style>
+    <script src="/global.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            localStorage.removeItem("carrito"); // Borramos el carrito
-            localStorage.removeItem("precioEnvio"); // Borramos datos temporales
-            // Opcional: Podrías borrar también el CP si querés
+            localStorage.removeItem("carrito");
+            localStorage.removeItem("precioEnvio");
+            localStorage.removeItem("codigoPostal");
+            localStorage.removeItem("metodoEnvio");
+            localStorage.removeItem("nombreTransportista");
+            localStorage.removeItem("costoEnvioCalculado");
         });
     </script>
 </head>
 <body>
-    
-    <div class="mensaje-container">
-        <div class="icono-exito">✔</div>
-        <h1>¡Gracias por tu compra!</h1>
-        <p>Tu pedido ha sido procesado correctamente. Nos pondremos en contacto con vos a la brevedad para coordinar la entrega.</p>
-        
-        <a href="index.html" class="btn-volver">VOLVER A LA TIENDA</a>
-    </div>
+    <header>
+        <nav id="navbar" class="navbar">
+            <a href="/" id="logo" class="logo-container">
+                <img src="/images/logo-arca.png" alt="Logo El Arca Home" class="logo">
+            </a>
+        </nav>
+    </header>
 
+    <main style="flex:1; display:flex;">
+        <div class="mensaje-container">
+            <div class="icono-exito">✔</div>
+            <h1>¡Gracias por tu compra!</h1>
+            <p>Tu pago ha sido procesado exitosamente. Nos pondremos en contacto con vos a la brevedad para coordinar la entrega de tus productos.</p>
+            
+            <a href="/" class="btn-volver">VOLVER A LA TIENDA</a>
+        </div>
+    </main>
 </body>
 </html>

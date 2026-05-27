@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,7 +95,7 @@ public class PedidoWebController {
 
             // PREPARAMOS LOS DATOS PARA FISERV
             String montoFormateado = String.format("%.2f", pedido.getTotalFinal()).replace(",", ".");
-            String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy:MM:dd-HH:mm:ss"));
+            String fechaHora = ZonedDateTime.now(ZoneId.of("America/Buenos_Aires")).format(DateTimeFormatter.ofPattern("yyyy:MM:dd-HH:mm:ss"));
             String hash = paymentService.crearHash(montoFormateado, fechaHora);
 
             // RESPONDEMOS AL FRONTEND CON EL JSON COMPLETO

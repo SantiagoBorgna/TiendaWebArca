@@ -235,8 +235,10 @@ async function enviarPedidoAlBackend(metodo) {
             hash_algorithm: "SHA256",
             hash: data.hash,
             txntype: "sale",
-            timezone: "America/Argentina/Buenos_Aires",
-            oid: data.idPedido // El ID de tu base de datos
+            timezone: "America/Buenos_Aires",
+            oid: data.idPedido, // El ID de tu base de datos
+            responseSuccessURL: "https://elarcahome.com.ar/exito",
+            responseFailURL: "https://elarcahome.com.ar/fallo"
         };
 
         console.log("Creando formulario con estos datos:", inputs);
