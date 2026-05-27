@@ -33,18 +33,18 @@ public class PaymentService {
         }
     }
 
-    public String crearHashExtendido(String montoTotal, String fechaHora, String oid) {
+    public String crearHashExtendido(String montoTotal, String fechaHora) {
         try {
             // Documentación Fiserv: Hash Extendido HMAC-SHA256. 
             // Se deben ordenar los NOMBRES de los parámetros a enviar alfabéticamente:
-            // chargetotal, currency, hash_algorithm, oid, responseFailURL, responseSuccessURL, storename, txndatetime
+            // chargetotal, currency, hash_algorithm, responseFailURL, responseSuccessURL, storename, txndatetime
             
             String responseFailURL = "https://elarcahome.com.ar/fallo";
             String responseSuccessURL = "https://elarcahome.com.ar/exito";
             String hashAlgorithm = "HMACSHA256";
             
-            // Se concatenan sus VALORES separados por |
-            String cadenaAEnciptar = montoTotal + "|" + CURRENCY + "|" + hashAlgorithm + "|" + oid + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + fechaHora;
+            // Se concatenan sus VALORES separados por | (Hemos removido el OID opcional)
+            String cadenaAEnciptar = montoTotal + "|" + CURRENCY + "|" + hashAlgorithm + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + fechaHora;
 
             System.out.println("🔒 Generando HMAC Hash Extendido para: " + cadenaAEnciptar);
 

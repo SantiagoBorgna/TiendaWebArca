@@ -96,8 +96,7 @@ public class PedidoWebController {
             // PREPARAMOS LOS DATOS PARA FISERV
             String montoFormateado = String.format("%.2f", pedido.getTotalFinal()).replace(",", ".");
             String fechaHora = ZonedDateTime.now(ZoneId.of("America/Buenos_Aires")).format(DateTimeFormatter.ofPattern("yyyy:MM:dd-HH:mm:ss"));
-            String oid = pedido.getId().toString();
-            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora, oid);
+            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora);
 
             // RESPONDEMOS AL FRONTEND CON EL JSON COMPLETO
             Map<String, Object> respuesta = new HashMap<>();

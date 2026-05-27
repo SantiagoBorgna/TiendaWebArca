@@ -234,7 +234,6 @@ async function enviarPedidoAlBackend(metodo) {
             currency: data.currency,
             hashExtended: data.hashExtended,
             hash_algorithm: data.hash_algorithm,
-            oid: data.idPedido, // El ID de tu base de datos
             responseSuccessURL: data.responseSuccessURL,
             responseFailURL: data.responseFailURL
         };
