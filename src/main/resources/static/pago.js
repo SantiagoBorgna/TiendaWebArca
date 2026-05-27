@@ -232,10 +232,8 @@ async function enviarPedidoAlBackend(metodo) {
             txndatetime: data.txndatetime,
             chargetotal: data.chargetotal,
             currency: data.currency,
-            hash_algorithm: "SHA256",
+            hash_algorithm: "HMACSHA256",
             hash: data.hash,
-            txntype: "sale",
-            timezone: "America/Buenos_Aires",
             oid: data.idPedido, // El ID de tu base de datos
             responseSuccessURL: "https://elarcahome.com.ar/exito",
             responseFailURL: "https://elarcahome.com.ar/fallo"
