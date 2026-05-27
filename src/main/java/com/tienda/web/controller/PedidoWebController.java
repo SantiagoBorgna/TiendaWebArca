@@ -104,7 +104,9 @@ public class PedidoWebController {
             respuesta.put("txndatetime", fechaHora);
             respuesta.put("chargetotal", montoFormateado);
             respuesta.put("hash", hash);
-            respuesta.put("urlFiserv", "https://test.ipg-online.com/connect/gateway/processing");
+            // respuesta.put("urlFiserv",
+            // "https://test.ipg-online.com/connect/gateway/processing");
+            respuesta.put("urlFiserv", "https://www1.ipg-online.com/connect/gateway/processing");
 
             // ESPÍA SEGURO PARA LOS LOGS DE RAILWAY
             System.out.println("===== DEBUG PAGO =====");
