@@ -96,7 +96,8 @@ public class PedidoWebController {
             // PREPARAMOS LOS DATOS PARA FISERV
             String montoFormateado = String.format("%.2f", pedido.getTotalFinal()).replace(",", ".");
             String fechaHora = ZonedDateTime.now(ZoneId.of("America/Buenos_Aires")).format(DateTimeFormatter.ofPattern("yyyy:MM:dd-HH:mm:ss"));
-            String hash = paymentService.crearHash(montoFormateado, fechaHora);
+            String oid = pedido.getId().toString();
+            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora, oid);
 
             // RESPONDEMOS AL FRONTEND CON EL JSON COMPLETO
             Map<String, Object> respuesta = new HashMap<>();
@@ -105,8 +106,11 @@ public class PedidoWebController {
             respuesta.put("currency", paymentService.getCurrency());
             respuesta.put("txndatetime", fechaHora);
             respuesta.put("chargetotal", montoFormateado);
-            respuesta.put("hash", hash);
+            respuesta.put("hashExtended", hash);
             respuesta.put("urlFiserv", "https://test.ipg-online.com/connect/gateway/processing");
+            respuesta.put("responseSuccessURL", "https://elarcahome.com.ar/exito");
+            respuesta.put("responseFailURL", "https://elarcahome.com.ar/fallo");
+            respuesta.put("hash_algorithm", "HMACSHA256");
 
             // ESPÍA SEGURO PARA LOS LOGS DE RAILWAY
             System.out.println("===== DEBUG PAGO =====");

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Formatter;
+import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -21,11 +22,31 @@ public class PaymentService {
 
     public String crearHash(String montoTotal, String fechaHora) {
         try {
-            // Generación de HASH avanzado utilizando HMAC-SHA256 que requiere Fiserv Connect
-            // Separador es Pipe (|) y NO se incluye el SharedSecret al final del string.
             String cadenaAEnciptar = storeId + "|" + fechaHora + "|" + montoTotal + "|" + CURRENCY;
+            Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secret_key = new SecretKeySpec(sharedSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+            sha256_HMAC.init(secret_key);
+            byte[] hashBytes = sha256_HMAC.doFinal(cadenaAEnciptar.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(hashBytes);
+        } catch (Exception e) {
+            throw new RuntimeException("Error HMAC", e);
+        }
+    }
 
-            System.out.println("🔒 Generando HMAC Hash para: " + cadenaAEnciptar);
+    public String crearHashExtendido(String montoTotal, String fechaHora, String oid) {
+        try {
+            // Documentación Fiserv: Hash Extendido HMAC-SHA256. 
+            // Se deben ordenar los NOMBRES de los parámetros a enviar alfabéticamente:
+            // chargetotal, currency, hash_algorithm, oid, responseFailURL, responseSuccessURL, storename, txndatetime
+            
+            String responseFailURL = "https://elarcahome.com.ar/fallo";
+            String responseSuccessURL = "https://elarcahome.com.ar/exito";
+            String hashAlgorithm = "HMACSHA256";
+            
+            // Se concatenan sus VALORES separados por |
+            String cadenaAEnciptar = montoTotal + "|" + CURRENCY + "|" + hashAlgorithm + "|" + oid + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + fechaHora;
+
+            System.out.println("🔒 Generando HMAC Hash Extendido para: " + cadenaAEnciptar);
 
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
             SecretKeySpec secret_key = new SecretKeySpec(sharedSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
@@ -33,11 +54,11 @@ public class PaymentService {
             
             byte[] hashBytes = sha256_HMAC.doFinal(cadenaAEnciptar.getBytes(StandardCharsets.UTF_8));
 
-            // Convertir a base64 o hex? Fiserv Connect usa Hex para HMAC.
-            return bytesToHex(hashBytes);
+            // Para Hash Extendido, Fiserv exige la firma en Base64
+            return Base64.getEncoder().encodeToString(hashBytes);
 
         } catch (Exception e) {
-            throw new RuntimeException("Error al generar el hash de pago HMAC", e);
+            throw new RuntimeException("Error al generar el hash extendido de pago HMAC", e);
         }
     }
 

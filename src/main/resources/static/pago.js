@@ -232,11 +232,11 @@ async function enviarPedidoAlBackend(metodo) {
             txndatetime: data.txndatetime,
             chargetotal: data.chargetotal,
             currency: data.currency,
-            hash_algorithm: "HMACSHA256",
-            hash: data.hash,
+            hashExtended: data.hashExtended,
+            hash_algorithm: data.hash_algorithm,
             oid: data.idPedido, // El ID de tu base de datos
-            responseSuccessURL: "https://elarcahome.com.ar/exito",
-            responseFailURL: "https://elarcahome.com.ar/fallo"
+            responseSuccessURL: data.responseSuccessURL,
+            responseFailURL: data.responseFailURL
         };
 
         console.log("Creando formulario con estos datos:", inputs);
