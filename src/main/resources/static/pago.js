@@ -86,35 +86,54 @@ function inicializarMediosDePago() {
 }
 
 function actualizarPrecioPantalla() {
-    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    const costoEnvio = parseFloat(localStorage.getItem("precioEnvio")) || 0;
-    
-    let totalBase = 0;
-    carrito.forEach(item => {
-        totalBase += item.precioVenta * item.cantidad;
-    });
-
-    let total = totalBase + costoEnvio;
-    interesAplicado = 0;
-    descuentoAplicado = 0;
-
-    if (medioPagoSeleccionado === "transferencia") {
-        // Descuento 20%
-        descuentoAplicado = total * 0.20;
-        total = total - descuentoAplicado;
-    } else {
-        // Fiserv - Cuotas
-        if (cuotasSeleccionadas === 3) {
-            interesAplicado = total * 0.15; // 15% interés
-        } else if (cuotasSeleccionadas === 6) {
-            interesAplicado = total * 0.30; // 30% interés
+    try {
+        let totalBase = 0;
+        const carritoStr = localStorage.getItem("carrito");
+        if (carritoStr) {
+            const arr = JSON.parse(carritoStr);
+            if (Array.isArray(arr)) {
+                arr.forEach(item => {
+                    const cant = parseInt(item.cantidad) || 0;
+                    const precio = parseFloat(item.precioVenta) || parseFloat(item.precio) || 0;
+                    totalBase += precio * cant;
+                });
+            }
         }
-        total = total + interesAplicado;
-    }
 
-    const divTotal = document.getElementById("total-final-pantalla");
-    if(divTotal) {
-        divTotal.textContent = "$ " + total.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const envioStr = localStorage.getItem("precioEnvio");
+        const costoEnvio = envioStr ? parseFloat(envioStr) || 0 : 0;
+        
+        let total = totalBase + costoEnvio;
+        interesAplicado = 0;
+        descuentoAplicado = 0;
+
+        const selectCuotas = document.getElementById("selector-cuotas");
+        const panelCuotas = document.getElementById("panel-tarjeta");
+
+        if (medioPagoSeleccionado === "transferencia") {
+            descuentoAplicado = total * 0.20;
+            total = total - descuentoAplicado;
+            
+            // Ocultar selector si es transferencia (por bug visual que detectó el usuario)
+            if (panelCuotas) panelCuotas.style.display = "none";
+        } else {
+            // Asegurar que el selector esté visible
+            if (panelCuotas) panelCuotas.style.display = "block";
+            
+            if (cuotasSeleccionadas === 3) {
+                interesAplicado = total * 0.15;
+            } else if (cuotasSeleccionadas === 6) {
+                interesAplicado = total * 0.30;
+            }
+            total = total + interesAplicado;
+        }
+
+        const divTotal = document.getElementById("total-final-pantalla");
+        if(divTotal) {
+            divTotal.textContent = "$ " + total.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+    } catch (e) {
+        console.error("Error calculando total:", e);
     }
 }
 
