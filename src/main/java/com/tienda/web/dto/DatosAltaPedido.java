@@ -24,6 +24,7 @@ public record DatosAltaPedido(
                 String medioPago,
                 Double totalProductos,
                 Double totalFinal,
+                Integer numberOfInstallments,
 
                 // Items (Para descontar stock y generar resumen)
                 List<ItemPedidoDto> items) {

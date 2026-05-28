@@ -69,26 +69,22 @@ public class PedidoWebController {
                     .collect(Collectors.joining(", "));
             pedido.setResumenArticulos(resumen);
 
-            // Descontar Stock
+            // IMPORTANTE: NO DESCONTAMOS STOCK ACÁ. Se descuenta cuando Fiserv aprueba (o aprobación manual por transferencia).
+            // Validamos stock pero no lo restamos de la DB todavía.
             for (ItemPedidoDto item : datos.items()) {
                 var articulo = articuloRepository.findById(item.id())
                         .orElseThrow(() -> new RuntimeException("Artículo no encontrado: " + item.id()));
 
                 int totalStock = articulo.getCant1() + articulo.getCant3();
-
                 if (totalStock < item.cantidad()) {
                     throw new RuntimeException("Sin stock suficiente para: " + articulo.getNombre());
                 }
+            }
 
-                if (articulo.getCant1() >= item.cantidad()) {
-                    articulo.setCant1(articulo.getCant1() - item.cantidad());
-                } else {
-                    int restante = item.cantidad() - articulo.getCant1();
-                    articulo.setCant1(0);
-                    articulo.setCant3(articulo.getCant3() - restante);
-                }
-
-                articuloRepository.save(articulo);
+            if ("transferencia".equalsIgnoreCase(datos.medioPago())) {
+                pedido.setEstado("PENDIENTE_TRANSFERENCIA");
+            } else {
+                pedido.setEstado("PENDIENTE_PAGO");
             }
 
             pedidoRepository.save(pedido);
@@ -96,7 +92,7 @@ public class PedidoWebController {
             // PREPARAMOS LOS DATOS PARA FISERV
             String montoFormateado = String.format("%.2f", pedido.getTotalFinal()).replace(",", ".");
             String fechaHora = ZonedDateTime.now(ZoneId.of("America/Buenos_Aires")).format(DateTimeFormatter.ofPattern("yyyy:MM:dd-HH:mm:ss"));
-            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora);
+            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora, datos.numberOfInstallments());
 
             // RESPONDEMOS AL FRONTEND CON EL JSON COMPLETO
             Map<String, Object> respuesta = new HashMap<>();
@@ -107,11 +103,14 @@ public class PedidoWebController {
             respuesta.put("chargetotal", montoFormateado);
             respuesta.put("hashExtended", hash);
             respuesta.put("urlFiserv", "https://test.ipg-online.com/connect/gateway/processing");
-            respuesta.put("responseSuccessURL", "https://elarcahome.com.ar/exito");
-            respuesta.put("responseFailURL", "https://elarcahome.com.ar/fallo");
+            respuesta.put("responseSuccessURL", "https://elarcahome.com.ar/api/pedidos/retorno-exito");
+            respuesta.put("responseFailURL", "https://elarcahome.com.ar/api/pedidos/retorno-fallo");
             respuesta.put("hash_algorithm", "HMACSHA256");
             respuesta.put("timezone", "America/Buenos_Aires");
             respuesta.put("checkoutoption", "combinedpage");
+            if (datos.numberOfInstallments() != null && datos.numberOfInstallments() > 1) {
+                respuesta.put("numberOfInstallments", datos.numberOfInstallments());
+            }
             respuesta.put("txntype", "sale");
 
             // ESPÍA SEGURO PARA LOS LOGS DE RAILWAY
@@ -129,5 +128,25 @@ public class PedidoWebController {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Error al procesar pedido: " + e.getMessage());
         }
+    }
+
+    // El frontend hará fetch a este endpoint cuando Fiserv retorne.
+    // Aunque normalmente Fiserv hace un form POST directo al Controller que devuelve una vista,
+    // nosotros lo vamos a interceptar.
+    @PostMapping(value = "/retorno-exito", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @Transactional
+    public void pagoExitoso(@RequestParam Map<String, String> allParams, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        System.out.println("====== FISERV PAGO EXITOSO ======");
+        allParams.forEach((k, v) -> System.out.println(k + ": " + v));
+        // Aquí iría la lógica definitiva para buscar el Pedido y descontar el stock
+        // Por el momento, simplemente evitamos el Error 404 redirigiendo a la pantalla final.
+        response.sendRedirect("/exito.html");
+    }
+
+    @PostMapping(value = "/retorno-fallo", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public void pagoFallido(@RequestParam Map<String, String> allParams, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        System.out.println("====== FISERV PAGO FALLIDO ======");
+        allParams.forEach((k, v) -> System.out.println(k + ": " + v));
+        response.sendRedirect("/fallo.html");
     }
 }

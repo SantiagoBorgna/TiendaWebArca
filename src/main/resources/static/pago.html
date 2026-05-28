@@ -159,11 +159,52 @@
         </div>
 
         <div class="pantalla-derecha">
-            <img src="/images/tarjetas.jpg" alt="Medios de pago disponibles">
-        </div>
+            <div class="panel-pago">
+                <h2>Método de Pago</h2>
+                <div class="opciones-pago">
+                    <label class="opcion-card">
+                        <input type="radio" name="metodo_pago" value="fiserv" checked>
+                        <div class="opcion-contenido">
+                            <span class="icono">💳</span>
+                            <div class="textos">
+                                <strong>Tarjeta de Crédito / Débito</strong>
+                                <small>Pago seguro vía IPG Connect</small>
+                            </div>
+                        </div>
+                    </label>
 
+                    <label class="opcion-card">
+                        <input type="radio" name="metodo_pago" value="transferencia">
+                        <div class="opcion-contenido">
+                            <span class="icono">🏦</span>
+                            <div class="textos">
+                                <strong>Transferencia Bancaria <span class="badge-descuento">20% OFF</span></strong>
+                                <small>Aprobación manual rápida</small>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <div id="panel-tarjeta" class="panel-detalle">
+                    <label for="selector-cuotas">Seleccionar Cuotas</label>
+                    <select id="selector-cuotas" class="select-cuotas">
+                        <option value="1">1 Pago - Sin interés</option>
+                        <option value="3">3 Cuotas (Demo interés)</option>
+                        <option value="6">6 Cuotas (Demo interés)</option>
+                    </select>
+                </div>
+
+                <div id="panel-transferencia" class="panel-detalle" style="display: none;">
+                    <p class="texto-informativo">Al finalizar serás redirigido para ver los datos bancarios (CBU/Alias) y podrás enviarnos el comprobante de pago.</p>
+                </div>
+
+                <div class="resumen-total">
+                    <h3>Total a Pagar</h3>
+                    <div id="total-final-pantalla" class="precio-destacado">$ 0.00</div>
+                </div>
+            </div>
+        </div>
+    
     </main>
-    
-    
 </body>
 </html>

@@ -45,7 +45,78 @@ document.addEventListener("DOMContentLoaded", () => {
             await enviarPedidoAlBackend(metodo);
         });
     }
+
+    // Inicializar lógica de medios de pago
+    inicializarMediosDePago();
 });
+
+let interesAplicado = 0;
+let descuentoAplicado = 0;
+let cuotasSeleccionadas = 1;
+let medioPagoSeleccionado = "fiserv";
+
+function inicializarMediosDePago() {
+    const radiosPago = document.querySelectorAll('input[name="metodo_pago"]');
+    const panelTarjeta = document.getElementById("panel-tarjeta");
+    const panelTransf = document.getElementById("panel-transferencia");
+    const selectCuotas = document.getElementById("selector-cuotas");
+
+    radiosPago.forEach(radio => {
+        radio.addEventListener("change", (e) => {
+            medioPagoSeleccionado = e.target.value;
+            if (medioPagoSeleccionado === "fiserv") {
+                panelTarjeta.style.display = "block";
+                panelTransf.style.display = "none";
+            } else {
+                panelTarjeta.style.display = "none";
+                panelTransf.style.display = "block";
+            }
+            actualizarPrecioPantalla();
+        });
+    });
+
+    if(selectCuotas) {
+        selectCuotas.addEventListener("change", (e) => {
+            cuotasSeleccionadas = parseInt(e.target.value);
+            actualizarPrecioPantalla();
+        });
+    }
+
+    actualizarPrecioPantalla();
+}
+
+function actualizarPrecioPantalla() {
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    const costoEnvio = parseFloat(localStorage.getItem("precioEnvio")) || 0;
+    
+    let totalBase = 0;
+    carrito.forEach(item => {
+        totalBase += item.precioVenta * item.cantidad;
+    });
+
+    let total = totalBase + costoEnvio;
+    interesAplicado = 0;
+    descuentoAplicado = 0;
+
+    if (medioPagoSeleccionado === "transferencia") {
+        // Descuento 20%
+        descuentoAplicado = total * 0.20;
+        total = total - descuentoAplicado;
+    } else {
+        // Fiserv - Cuotas
+        if (cuotasSeleccionadas === 3) {
+            interesAplicado = total * 0.15; // 15% interés
+        } else if (cuotasSeleccionadas === 6) {
+            interesAplicado = total * 0.30; // 30% interés
+        }
+        total = total + interesAplicado;
+    }
+
+    const divTotal = document.getElementById("total-final-pantalla");
+    if(divTotal) {
+        divTotal.textContent = "$ " + total.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+}
 
 /* Validación */
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
@@ -189,12 +260,21 @@ async function enviarPedidoAlBackend(metodo) {
         }
 
         // Armar el objeto final
+        let totalRecalculado = totalProductos + costoEnvio;
+        if (medioPagoSeleccionado === "transferencia") {
+            totalRecalculado = totalRecalculado - descuentoAplicado;
+        } else {
+            totalRecalculado = totalRecalculado + interesAplicado;
+        }
+
         const pedidoData = {
             ...datosForm,
             metodoEnvio: nombreMetodoEnvio,
             costoEnvio: costoEnvio,
             totalProductos: totalProductos,
-            totalFinal: totalProductos + costoEnvio,
+            totalFinal: totalRecalculado,
+            medioPago: medioPagoSeleccionado,
+            numberOfInstallments: cuotasSeleccionadas,
             items: itemsDto
         };
 
@@ -211,17 +291,23 @@ async function enviarPedidoAlBackend(metodo) {
             throw new Error(await response.text());
         }
 
-        // 1. Recibimos la respuesta completa del backend (el JSON con el Hash y los datos)
         const data = await response.json(); 
 
-        // 2. Limpiamos el carrito porque el pedido ya está guardado en tu Base de Datos
+        // Limpiamos carrito
         localStorage.setItem("carrito", "[]");
         localStorage.removeItem("precioEnvio");
         localStorage.removeItem("metodoEnvio");
         localStorage.removeItem("nombreTransportista");
         localStorage.removeItem("costoEnvioCalculado");
 
-        // 3. CREAMOS EL FORMULARIO OCULTO PARA FISERV
+        if (medioPagoSeleccionado === "transferencia") {
+            // Guardamos el ID en localStorage para mostrarlo en la vista de éxito
+            localStorage.setItem("ultimoPedidoId", data.idPedido);
+            window.location.href = "/transferencia_exitosa.html";
+            return;
+        }
+
+        // CREAMOS EL FORMULARIO OCULTO PARA FISERV
         const form = document.createElement("form");
         form.method = "POST";
         form.action = data.urlFiserv;
@@ -238,12 +324,12 @@ async function enviarPedidoAlBackend(metodo) {
             responseFailURL: data.responseFailURL,
             timezone: data.timezone,
             checkoutoption: data.checkoutoption,
+            numberOfInstallments: cuotasSeleccionadas,
             txntype: data.txntype
         };
 
         console.log("Creando formulario con estos datos:", inputs);
 
-        // Creamos los inputs invisibles y los agregamos al formulario
         for (const key in inputs) {
             const input = document.createElement("input");
             input.type = "hidden";
@@ -252,7 +338,6 @@ async function enviarPedidoAlBackend(metodo) {
             form.appendChild(input);
         }
 
-        // Agregamos el formulario al documento y lo enviamos automáticamente
         document.body.appendChild(form);
         form.submit(); 
 

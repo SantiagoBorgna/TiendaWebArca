@@ -193,3 +193,23 @@ main {
     height: auto;
 }
 }
+.panel-pago { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.panel-pago h2 { margin-top: 0; font-size: 1.5rem; text-align: center; margin-bottom: 20px; }
+.opciones-pago { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+.opcion-card { border: 2px solid #eee; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.3s ease; position: relative; }
+.opcion-card:hover { border-color: #ccc; }
+.opcion-card input[type="radio"] { display: none; }
+.opcion-card input[type="radio"]:checked + .opcion-contenido { color: #0088cc; }
+.opcion-card input[type="radio"]:checked ~ .opcion-card { border-color: #0088cc; background-color: #f0f8ff; }
+.opcion-contenido { display: flex; align-items: center; gap: 15px; }
+.icono { font-size: 2rem; }
+.textos { display: flex; flex-direction: column; }
+.textos strong { font-size: 1.1rem; color: #333; }
+.textos small { color: #777; font-size: 0.85rem; }
+.badge-descuento { background: #e2f4e2; color: #2e8b57; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px; }
+.panel-detalle { margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; }
+.select-cuotas { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-top: 10px; font-size: 1rem; }
+.texto-informativo { color: #555; font-size: 0.9rem; line-height: 1.4; margin: 0; }
+.resumen-total { border-top: 1px solid #eee; padding-top: 20px; text-align: center; }
+.precio-destacado { font-size: 2rem; font-weight: bold; color: #333; margin-top: 10px; }
+

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transferencia Bancaria | El Arca Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link rel="icon" href="/images/logo-arca.png" type="image/png">
+    <link rel="stylesheet" href="pago.css" />
+    <style>
+        .pantalla-centro {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .pantalla-centro h1 { color: #333; margin-bottom: 10px; }
+        .pantalla-centro p { color: #666; line-height: 1.5; }
+        .datos-bancarios {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .datos-bancarios p { margin: 10px 0; font-size: 1.1rem; color: #222; }
+        .btn-wsp {
+            display: inline-block;
+            background-color: #25D366;
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            margin-top: 20px;
+        }
+        .btn-wsp:hover { background-color: #128C7E; }
+        .id-pedido { font-size: 1.2rem; font-weight: bold; color: #0088cc; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav id="navbar" class="navbar">
+            <a href="/" id="logo" class="logo-container" style="margin: 0 auto;">
+                <img src="/images/logo-arca.png" alt="Logo" class="logo">
+            </a>
+        </nav>
+    </header>
+    
+    <main>
+        <div class="pantalla-centro">
+            <h1>¡Pedido Registrado con Éxito!</h1>
+            <p>Tu pedido ha sido guardado y se encuentra <strong>Pendiente de Transferencia</strong>.</p>
+            <p>ID de tu Pedido: <span class="id-pedido" id="pedido-id-text">Cargando...</span></p>
+
+            <div class="datos-bancarios">
+                <h3>Datos para transferir:</h3>
+                <p><strong>CBU:</strong> [A confirmar]</p>
+                <p><strong>Alias:</strong> [A confirmar]</p>
+                <p><strong>Titular:</strong> [A confirmar]</p>
+                <p><strong>Banco:</strong> [A confirmar]</p>
+            </div>
+
+            <p>Una vez realizada la transferencia, envíanos el comprobante por WhatsApp indicando tu número de pedido.</p>
+            
+            <a href="https://wa.me/5491100000000?text=Hola!%20Acabo%20de%20realizar%20el%20pago%20por%20transferencia%20de%20mi%20pedido%20WEB." id="btn-whatsapp" class="btn-wsp" target="_blank">Enviar Comprobante por WhatsApp</a>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const pedidoId = localStorage.getItem("ultimoPedidoId");
+            if(pedidoId) {
+                document.getElementById("pedido-id-text").textContent = "#" + pedidoId;
+                
+                const btnWsp = document.getElementById("btn-whatsapp");
+                btnWsp.href = `https://wa.me/5491100000000?text=Hola!%20Acabo%20de%20realizar%20el%20pago%20por%20transferencia%20de%20mi%20pedido%20WEB%20%23${pedidoId}.%20Adjunto%20el%20comprobante.`;
+            }
+        });
+    </script>
+</body>
+</html>
