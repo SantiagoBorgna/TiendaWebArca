@@ -49,10 +49,6 @@
 <body>
     <header>
         <nav id="navbar" class="navbar">
-            <a href="/" class="nav-left">
-                <span class="texto-volver">Volver a la tienda</span>
-                <span class="flecha-volver"><img src="/images/arrow.png" alt="Volver"></span> 
-            </a>
             <a href="/" id="logo" class="logo-container">
                 <img src="/images/logo-arca.png" alt="Logo" class="logo">
             </a>
@@ -81,12 +77,20 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // Limpiamos carrito porque la compra está confirmada
+            localStorage.setItem("carrito", "[]");
+            localStorage.removeItem("precioEnvio");
+            localStorage.removeItem("codigoPostal");
+            localStorage.removeItem("metodoEnvio");
+            localStorage.removeItem("nombreTransportista");
+            localStorage.removeItem("costoEnvioCalculado");
+
             const pedidoId = localStorage.getItem("ultimoPedidoId");
             if(pedidoId) {
                 document.getElementById("pedido-id-text").textContent = "#" + pedidoId;
                 
                 const btnWsp = document.getElementById("btn-whatsapp");
-                btnWsp.href = `https://wa.me/5493572439160?text=Hola!%20Acabo%20de%20realizar%20el%20pago%20por%20transferencia%20de%20mi%20pedido%20WEB%20%23${pedidoId}.%20Adjunto%20el%20comprobante.`;
+                btnWsp.href = `https://wa.me/5491100000000?text=Hola!%20Acabo%20de%20realizar%20el%20pago%20por%20transferencia%20de%20mi%20pedido%20WEB%20%23${pedidoId}.%20Adjunto%20el%20comprobante.`;
             }
         });
     </script>

@@ -17,13 +17,12 @@
             background-color: #fafafa;
         }
         .mensaje-container {
-            margin: auto;
             padding: 50px 40px;
             max-width: 550px;
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            margin-top: 60px;
+            width: 100%;
         }
         .icono-fallo {
             color: #d32f2f;
@@ -61,17 +60,13 @@
 <body>
     <header>
         <nav id="navbar" class="navbar">
-            <a href="/pago" class="nav-left">
-                <span class="texto-volver">Reintentar pago</span>
-                <span class="flecha-volver"><img src="/images/arrow.png" alt="Volver"></span> 
-            </a>
             <a href="/" id="logo" class="logo-container">
                 <img src="/images/logo-arca.png" alt="Logo El Arca Home" class="logo">
             </a>
         </nav>
     </header>
 
-    <main style="flex:1; display:flex;">
+    <main style="flex:1; display:flex; align-items:center; justify-content:center; padding: 20px;">
         <div class="mensaje-container">
             <div class="icono-fallo">✕</div>
             <h1>Hubo un problema</h1>

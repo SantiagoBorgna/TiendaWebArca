@@ -312,13 +312,6 @@ async function enviarPedidoAlBackend(metodo) {
 
         const data = await response.json(); 
 
-        // Limpiamos carrito
-        localStorage.setItem("carrito", "[]");
-        localStorage.removeItem("precioEnvio");
-        localStorage.removeItem("metodoEnvio");
-        localStorage.removeItem("nombreTransportista");
-        localStorage.removeItem("costoEnvioCalculado");
-
         if (medioPagoSeleccionado === "transferencia") {
             // Guardamos el ID en localStorage para mostrarlo en la vista de éxito
             localStorage.setItem("ultimoPedidoId", data.idPedido);
