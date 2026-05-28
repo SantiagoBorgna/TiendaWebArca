@@ -89,9 +89,9 @@ public class PedidoWebController {
 
             pedidoRepository.save(pedido);
 
-            // URLs personalizadas (El Caballo de Troya con el idPedido)
-            String urlExito = "https://elarcahome.com.ar/api/pedidos/retorno-exito?idPedido=" + pedido.getId();
-            String urlFallo = "https://elarcahome.com.ar/api/pedidos/retorno-fallo?idPedido=" + pedido.getId();
+            // URLs personalizadas (El Caballo de Troya con el idPedido pero limpio para evitar ValidationError)
+            String urlExito = "https://elarcahome.com.ar/api/pedidos/retorno-exito/" + pedido.getId();
+            String urlFallo = "https://elarcahome.com.ar/api/pedidos/retorno-fallo/" + pedido.getId();
 
             String montoFormateado = String.format("%.2f", pedido.getTotalFinal()).replace(",", ".");
             String fechaHora = ZonedDateTime.now(ZoneId.of("America/Buenos_Aires")).format(DateTimeFormatter.ofPattern("yyyy:MM:dd-HH:mm:ss"));
@@ -136,9 +136,9 @@ public class PedidoWebController {
     // El frontend hará fetch a este endpoint cuando Fiserv retorne.
     // Aunque normalmente Fiserv hace un form POST directo al Controller que devuelve una vista,
     // nosotros lo vamos a interceptar.
-    @PostMapping(value = "/retorno-exito", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/retorno-exito/{idPedido}", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @Transactional
-    public void pagoExitoso(@RequestParam Map<String, String> allParams, @RequestParam(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+    public void pagoExitoso(@RequestParam Map<String, String> allParams, @PathVariable(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         System.out.println("====== FISERV PAGO EXITOSO ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
         
@@ -187,9 +187,9 @@ public class PedidoWebController {
         response.sendRedirect("/exito.html");
     }
 
-    @PostMapping(value = "/retorno-fallo", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/retorno-fallo/{idPedido}", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @Transactional
-    public void pagoFallido(@RequestParam Map<String, String> allParams, @RequestParam(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+    public void pagoFallido(@RequestParam Map<String, String> allParams, @PathVariable(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         System.out.println("====== FISERV PAGO FALLIDO ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
         
