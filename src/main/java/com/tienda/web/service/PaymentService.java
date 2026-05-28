@@ -33,13 +33,13 @@ public class PaymentService {
         }
     }
 
-    public String crearHashExtendido(String montoTotal, String fechaHora, Integer cuotas) {
+    public String crearHashExtendido(String montoTotal, String fechaHora, Integer cuotas, String successUrl, String failUrl) {
         try {
             // Documentación Fiserv: Hash Extendido HMAC-SHA256. 
             // Se deben ordenar los NOMBRES de los parámetros a enviar alfabéticamente.
             
-            String responseFailURL = "https://elarcahome.com.ar/api/pedidos/retorno-fallo";
-            String responseSuccessURL = "https://elarcahome.com.ar/api/pedidos/retorno-exito";
+            String responseFailURL = failUrl;
+            String responseSuccessURL = successUrl;
             String hashAlgorithm = "HMACSHA256";
             String timezone = "America/Buenos_Aires";
             String checkoutoption = "combinedpage";

@@ -63,10 +63,10 @@ public class PedidoWebController {
             pedido.setTotalProductos(datos.totalProductos());
             pedido.setTotalFinal(datos.totalFinal());
 
-            // Resumen de Artículos
+            // Resumen de Artículos (incluimos id para descontar stock post-pago)
             String resumen = datos.items().stream()
-                    .map(i -> i.nombre() + " x" + i.cantidad())
-                    .collect(Collectors.joining(", "));
+                    .map(i -> i.nombre() + " x" + i.cantidad() + " (id:" + i.id() + ")")
+                    .collect(Collectors.joining(" | "));
             pedido.setResumenArticulos(resumen);
 
             // IMPORTANTE: NO DESCONTAMOS STOCK ACÁ. Se descuenta cuando Fiserv aprueba (o aprobación manual por transferencia).
@@ -89,10 +89,13 @@ public class PedidoWebController {
 
             pedidoRepository.save(pedido);
 
-            // PREPARAMOS LOS DATOS PARA FISERV
+            // URLs personalizadas (El Caballo de Troya con el idPedido)
+            String urlExito = "https://elarcahome.com.ar/api/pedidos/retorno-exito?idPedido=" + pedido.getId();
+            String urlFallo = "https://elarcahome.com.ar/api/pedidos/retorno-fallo?idPedido=" + pedido.getId();
+
             String montoFormateado = String.format("%.2f", pedido.getTotalFinal()).replace(",", ".");
             String fechaHora = ZonedDateTime.now(ZoneId.of("America/Buenos_Aires")).format(DateTimeFormatter.ofPattern("yyyy:MM:dd-HH:mm:ss"));
-            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora, datos.numberOfInstallments());
+            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora, datos.numberOfInstallments(), urlExito, urlFallo);
 
             // RESPONDEMOS AL FRONTEND CON EL JSON COMPLETO
             Map<String, Object> respuesta = new HashMap<>();
@@ -103,8 +106,8 @@ public class PedidoWebController {
             respuesta.put("chargetotal", montoFormateado);
             respuesta.put("hashExtended", hash);
             respuesta.put("urlFiserv", "https://test.ipg-online.com/connect/gateway/processing");
-            respuesta.put("responseSuccessURL", "https://elarcahome.com.ar/api/pedidos/retorno-exito");
-            respuesta.put("responseFailURL", "https://elarcahome.com.ar/api/pedidos/retorno-fallo");
+            respuesta.put("responseSuccessURL", urlExito);
+            respuesta.put("responseFailURL", urlFallo);
             respuesta.put("hash_algorithm", "HMACSHA256");
             respuesta.put("timezone", "America/Buenos_Aires");
             respuesta.put("checkoutoption", "combinedpage");
@@ -135,18 +138,68 @@ public class PedidoWebController {
     // nosotros lo vamos a interceptar.
     @PostMapping(value = "/retorno-exito", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @Transactional
-    public void pagoExitoso(@RequestParam Map<String, String> allParams, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+    public void pagoExitoso(@RequestParam Map<String, String> allParams, @RequestParam(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         System.out.println("====== FISERV PAGO EXITOSO ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
-        // Aquí iría la lógica definitiva para buscar el Pedido y descontar el stock
-        // Por el momento, simplemente evitamos el Error 404 redirigiendo a la pantalla final.
+        
+        if (idPedido != null) {
+            pedidoRepository.findById(idPedido).ifPresent(pedido -> {
+                if (!"PAGADO".equals(pedido.getEstado())) {
+                    pedido.setEstado("PAGADO");
+                    
+                    // Descontamos stock leyendo el resumen encubierto: Silla x2 (id:4) | Mesa x1 (id:8)
+                    String resumen = pedido.getResumenArticulos();
+                    if (resumen != null) {
+                        String[] items = resumen.split("\\|");
+                        for (String item : items) {
+                            try {
+                                int xIndex = item.lastIndexOf("x");
+                                int parenIndex = item.lastIndexOf("(id:");
+                                int closeIndex = item.lastIndexOf(")");
+                                
+                                if (xIndex != -1 && parenIndex != -1 && closeIndex != -1) {
+                                    String cantStr = item.substring(xIndex + 1, parenIndex).trim();
+                                    String idStr = item.substring(parenIndex + 4, closeIndex).trim();
+                                    
+                                    int cantidad = Integer.parseInt(cantStr);
+                                    Integer idArt = Integer.parseInt(idStr);
+                                    
+                                    articuloRepository.findById(idArt).ifPresent(articulo -> {
+                                        if (articulo.getCant1() >= cantidad) {
+                                            articulo.setCant1(articulo.getCant1() - cantidad);
+                                        } else {
+                                            int restante = cantidad - articulo.getCant1();
+                                            articulo.setCant1(0);
+                                            articulo.setCant3(articulo.getCant3() - restante);
+                                        }
+                                        articuloRepository.save(articulo);
+                                    });
+                                }
+                            } catch (Exception ignored) { }
+                        }
+                    }
+                    pedidoRepository.save(pedido);
+                    System.out.println("Pedido " + idPedido + " PAGADO y stock actualizado.");
+                }
+            });
+        }
+        
         response.sendRedirect("/exito.html");
     }
 
     @PostMapping(value = "/retorno-fallo", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public void pagoFallido(@RequestParam Map<String, String> allParams, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+    @Transactional
+    public void pagoFallido(@RequestParam Map<String, String> allParams, @RequestParam(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         System.out.println("====== FISERV PAGO FALLIDO ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
+        
+        if (idPedido != null) {
+            pedidoRepository.findById(idPedido).ifPresent(pedido -> {
+                pedido.setEstado("FALLIDO");
+                pedidoRepository.save(pedido);
+            });
+        }
+        
         response.sendRedirect("/fallo.html");
     }
 }
