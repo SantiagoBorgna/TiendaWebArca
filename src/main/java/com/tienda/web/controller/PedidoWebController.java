@@ -33,6 +33,9 @@ public class PedidoWebController {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private com.tienda.web.service.MailService mailService;
+
     @PostMapping("/crear")
     @Transactional
     public ResponseEntity<?> crearPedido(@RequestBody DatosAltaPedido datos) {
@@ -94,11 +97,12 @@ public class PedidoWebController {
 
             if ("transferencia".equalsIgnoreCase(datos.medioPago())) {
                 pedido.setEstado("PENDIENTE_TRANSFERENCIA");
+                pedidoRepository.save(pedido);
+                mailService.enviarMailConfirmacionAsync(pedido, true);
             } else {
                 pedido.setEstado("PENDIENTE_PAGO");
+                pedidoRepository.save(pedido);
             }
-
-            pedidoRepository.save(pedido);
 
             // URLs con ID inyectado en el path (El Caballo de Troya que ya probamos que Fiserv no rechaza y devuelve exitosamente)
             String urlExito = "https://elarcahome.com.ar/api/pedidos/retorno-exito/" + pedido.getId();
@@ -166,7 +170,8 @@ public class PedidoWebController {
                     }
                     
                     pedidoRepository.save(pedido);
-                    System.out.println("Pedido " + idPedido + " PAGADO. (Stock ya fue reservado en checkout).");
+                    mailService.enviarMailConfirmacionAsync(pedido, false);
+                    System.out.println("Pedido " + idPedido + " PAGADO. (Stock ya fue reservado en checkout). Correo enviado.");
                 }
             });
         }
@@ -214,7 +219,8 @@ public class PedidoWebController {
                         }
                         
                         pedidoRepository.save(pedido);
-                        System.out.println("Pedido " + idPedido + " PAGADO via WEBHOOK.");
+                        mailService.enviarMailConfirmacionAsync(pedido, false);
+                        System.out.println("Pedido " + idPedido + " PAGADO via WEBHOOK. Correo enviado.");
                     } else if ("DECLINED".equalsIgnoreCase(status) && "PENDIENTE_PAGO".equals(pedido.getEstado())) {
                         pedido.setEstado("FALLIDO");
                         reponerStockDeResumen(pedido);

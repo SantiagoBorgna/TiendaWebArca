@@ -69,6 +69,13 @@
                 <p><strong>Banco:</strong>Mercado Pago</p>
             </div>
 
+            <div id="resumen-compra" style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left; display: none; border: 1px solid #ddd; color: #333;">
+                <h3 style="margin-top: 0; color: #222;">Detalle de tu Pedido:</h3>
+                <ul id="lista-productos" style="padding-left: 20px; font-size: 14px;"></ul>
+                <hr style="border: 0; border-top: 1px solid #ddd; margin: 10px 0;">
+                <p style="font-weight: bold; text-align: right; margin: 0;">Total a transferir: $<span id="total-abonado"></span></p>
+            </div>
+
             <p>Una vez realizada la transferencia, envíanos el comprobante por WhatsApp indicando tu número de pedido.</p>
             
             <a href="https://wa.me/5493572439160?text=Hola!%20Acabo%20de%20realizar%20el%20pago%20por%20transferencia%20de%20mi%20pedido%20WEB." id="btn-whatsapp" class="btn-wsp" target="_blank">Enviar Comprobante por WhatsApp</a>
@@ -77,21 +84,42 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Limpiamos carrito porque la compra está confirmada
-            localStorage.setItem("carrito", "[]");
+            const pedidoId = localStorage.getItem("ultimoPedidoId");
+            const pedidoTotal = localStorage.getItem("ultimoPedidoTotal");
+            const pedidoItemsStr = localStorage.getItem("ultimoPedidoItems");
+
+            if(pedidoId) {
+                document.getElementById("pedido-id-text").textContent = "#" + pedidoId;
+                
+                const btnWsp = document.getElementById("btn-whatsapp");
+                btnWsp.href = `https://wa.me/5493572439160?text=Hola!%20Acabo%20de%20realizar%20el%20pago%20por%20transferencia%20de%20mi%20pedido%20WEB%20%23${pedidoId}.%20Adjunto%20el%20comprobante.`;
+            }
+
+            if (pedidoTotal && pedidoItemsStr) {
+                document.getElementById("resumen-compra").style.display = "block";
+                document.getElementById("total-abonado").textContent = parseFloat(pedidoTotal).toLocaleString("es-AR", {minimumFractionDigits: 2});
+                
+                try {
+                    const items = JSON.parse(pedidoItemsStr);
+                    const ul = document.getElementById("lista-productos");
+                    items.forEach(item => {
+                        const li = document.createElement("li");
+                        li.textContent = `${item.cantidad}x ${item.nombre} - $${(item.cantidad * item.precio).toLocaleString("es-AR", {minimumFractionDigits: 2})}`;
+                        ul.appendChild(li);
+                    });
+                } catch(e) {}
+            }
+
+            // Limpiamos carrito y todo rastro de sesión
+            localStorage.removeItem("carrito");
             localStorage.removeItem("precioEnvio");
             localStorage.removeItem("codigoPostal");
             localStorage.removeItem("metodoEnvio");
             localStorage.removeItem("nombreTransportista");
             localStorage.removeItem("costoEnvioCalculado");
-
-            const pedidoId = localStorage.getItem("ultimoPedidoId");
-            if(pedidoId) {
-                document.getElementById("pedido-id-text").textContent = "#" + pedidoId;
-                
-                const btnWsp = document.getElementById("btn-whatsapp");
-                btnWsp.href = `https://wa.me/5491100000000?text=Hola!%20Acabo%20de%20realizar%20el%20pago%20por%20transferencia%20de%20mi%20pedido%20WEB%20%23${pedidoId}.%20Adjunto%20el%20comprobante.`;
-            }
+            localStorage.removeItem("ultimoPedidoId");
+            localStorage.removeItem("ultimoPedidoTotal");
+            localStorage.removeItem("ultimoPedidoItems");
         });
     </script>
 </body>

@@ -140,8 +140,9 @@ function actualizarPrecioPantalla() {
 /* Validación */
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
 const REGEX_DNI = /^\d{7,8}$/;
-const REGEX_TEL = /^\d{10,15}$/; 
+const REGEX_TEL = /^\d{10,13}$/; 
 const REGEX_TEXTO = /.+/; 
+const REGEX_NOMBRE = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,}$/;
 
 function validarCampo(idInput, idError, regex, mensajeError) {
     const input = document.getElementById(idInput);
@@ -166,19 +167,19 @@ function validarCampo(idInput, idError, regex, mensajeError) {
 
 function validarFormularioRetiro() {
     let v = true;
-    v &= validarCampo("nombre-retiro", "error-nombre-retiro", REGEX_TEXTO, "Ingresá nombre y apellido.");
-    v &= validarCampo("dni-retiro", "error-dni-retiro", REGEX_DNI, "DNI inválido (solo números).");
+    v &= validarCampo("nombre-retiro", "error-nombre-retiro", REGEX_NOMBRE, "Mínimo 2 letras, sin números.");
+    v &= validarCampo("dni-retiro", "error-dni-retiro", REGEX_DNI, "Debe tener entre 7 y 8 números.");
     v &= validarCampo("email-retiro", "error-email-retiro", REGEX_EMAIL, "Ingresá un email válido.");
-    v &= validarCampo("telefono-retiro", "error-telefono-retiro", REGEX_TEL, "Teléfono inválido (solo números).");
+    v &= validarCampo("telefono-retiro", "error-telefono-retiro", REGEX_TEL, "Debe tener entre 10 y 13 números.");
     return !!v;
 }
 
 function validarFormularioEnvio() {
     let v = true;
-    v &= validarCampo("nombre-envio", "error-nombre-envio", REGEX_TEXTO, "Ingresá nombre y apellido.");
-    v &= validarCampo("dni-envio", "error-dni-envio", REGEX_DNI, "DNI inválido (solo números).");
+    v &= validarCampo("nombre-envio", "error-nombre-envio", REGEX_NOMBRE, "Mínimo 2 letras, sin números.");
+    v &= validarCampo("dni-envio", "error-dni-envio", REGEX_DNI, "Debe tener entre 7 y 8 números.");
     v &= validarCampo("email-envio", "error-email-envio", REGEX_EMAIL, "Ingresá un email válido.");
-    v &= validarCampo("telefono-envio", "error-telefono-envio", REGEX_TEL, "Teléfono inválido (solo números).");
+    v &= validarCampo("telefono-envio", "error-telefono-envio", REGEX_TEL, "Debe tener entre 10 y 13 números.");
     
     v &= validarCampo("calle", "error-calle", REGEX_TEXTO, "Falta la calle.");
     v &= validarCampo("localidad", "error-localidad", REGEX_TEXTO, "Falta la localidad.");
@@ -190,15 +191,15 @@ function validarFormularioEnvio() {
 
 function activarValidacionesEnTiempoReal(tipo) {
     if (tipo === "retiro") {
-        document.getElementById("nombre-retiro")?.addEventListener("blur", () => validarCampo("nombre-retiro", "error-nombre-retiro", REGEX_TEXTO, "Ingresá nombre."));
-        document.getElementById("dni-retiro")?.addEventListener("blur", () => validarCampo("dni-retiro", "error-dni-retiro", REGEX_DNI, "DNI solo números."));
+        document.getElementById("nombre-retiro")?.addEventListener("blur", () => validarCampo("nombre-retiro", "error-nombre-retiro", REGEX_NOMBRE, "Mínimo 2 letras, sin números."));
+        document.getElementById("dni-retiro")?.addEventListener("blur", () => validarCampo("dni-retiro", "error-dni-retiro", REGEX_DNI, "Debe tener 7 u 8 números."));
         document.getElementById("email-retiro")?.addEventListener("blur", () => validarCampo("email-retiro", "error-email-retiro", REGEX_EMAIL, "Email inválido."));
-        document.getElementById("telefono-retiro")?.addEventListener("blur", () => validarCampo("telefono-retiro", "error-telefono-retiro", REGEX_TEL, "Solo números."));
+        document.getElementById("telefono-retiro")?.addEventListener("blur", () => validarCampo("telefono-retiro", "error-telefono-retiro", REGEX_TEL, "Entre 10 y 13 números."));
     } else {
-        document.getElementById("nombre-envio")?.addEventListener("blur", () => validarCampo("nombre-envio", "error-nombre-envio", REGEX_TEXTO, "Ingresá nombre."));
-        document.getElementById("dni-envio")?.addEventListener("blur", () => validarCampo("dni-envio", "error-dni-envio", REGEX_DNI, "DNI solo números."));
+        document.getElementById("nombre-envio")?.addEventListener("blur", () => validarCampo("nombre-envio", "error-nombre-envio", REGEX_NOMBRE, "Mínimo 2 letras, sin números."));
+        document.getElementById("dni-envio")?.addEventListener("blur", () => validarCampo("dni-envio", "error-dni-envio", REGEX_DNI, "Debe tener 7 u 8 números."));
         document.getElementById("email-envio")?.addEventListener("blur", () => validarCampo("email-envio", "error-email-envio", REGEX_EMAIL, "Email inválido."));
-        document.getElementById("telefono-envio")?.addEventListener("blur", () => validarCampo("telefono-envio", "error-telefono-envio", REGEX_TEL, "Solo números."));
+        document.getElementById("telefono-envio")?.addEventListener("blur", () => validarCampo("telefono-envio", "error-telefono-envio", REGEX_TEL, "Entre 10 y 13 números."));
         document.getElementById("codigo-postal-envio")?.addEventListener("blur", () => validarCampo("codigo-postal-envio", "error-cp", /^\d{4,5}$/, "CP incorrecto."));
     }
 }
@@ -312,9 +313,12 @@ async function enviarPedidoAlBackend(metodo) {
 
         const data = await response.json(); 
 
+        // Guardamos información para la vista de éxito
+        localStorage.setItem("ultimoPedidoId", data.idPedido);
+        localStorage.setItem("ultimoPedidoTotal", data.chargetotal);
+        localStorage.setItem("ultimoPedidoItems", JSON.stringify(itemsDto));
+
         if (medioPagoSeleccionado === "transferencia") {
-            // Guardamos el ID en localStorage para mostrarlo en la vista de éxito
-            localStorage.setItem("ultimoPedidoId", data.idPedido);
             window.location.href = "/transferencia_exitosa.html";
             return;
         }

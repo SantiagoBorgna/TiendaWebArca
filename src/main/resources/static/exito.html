@@ -10,12 +10,36 @@
     <script src="/global.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            const pedidoId = localStorage.getItem("ultimoPedidoId");
+            const pedidoTotal = localStorage.getItem("ultimoPedidoTotal");
+            const pedidoItemsStr = localStorage.getItem("ultimoPedidoItems");
+
+            if (pedidoId && pedidoTotal && pedidoItemsStr) {
+                document.getElementById("resumen-compra").style.display = "block";
+                document.getElementById("nro-pedido").textContent = "#" + pedidoId;
+                document.getElementById("total-abonado").textContent = parseFloat(pedidoTotal).toLocaleString("es-AR", {minimumFractionDigits: 2});
+                
+                try {
+                    const items = JSON.parse(pedidoItemsStr);
+                    const ul = document.getElementById("lista-productos");
+                    items.forEach(item => {
+                        const li = document.createElement("li");
+                        li.textContent = `${item.cantidad}x ${item.nombre} - $${(item.cantidad * item.precio).toLocaleString("es-AR", {minimumFractionDigits: 2})}`;
+                        ul.appendChild(li);
+                    });
+                } catch(e) {}
+            }
+
+            // Limpiamos todo el carrito y datos de sesión una vez mostrado
             localStorage.removeItem("carrito");
             localStorage.removeItem("precioEnvio");
             localStorage.removeItem("codigoPostal");
             localStorage.removeItem("metodoEnvio");
             localStorage.removeItem("nombreTransportista");
             localStorage.removeItem("costoEnvioCalculado");
+            localStorage.removeItem("ultimoPedidoId");
+            localStorage.removeItem("ultimoPedidoTotal");
+            localStorage.removeItem("ultimoPedidoItems");
         });
     </script>
 </head>
@@ -32,7 +56,14 @@
         <div class="mensaje-container">
             <div class="icono-exito">✔</div>
             <h1>¡Gracias por tu compra!</h1>
-            <p>Tu pago ha sido procesado exitosamente. Nos pondremos en contacto con vos a la brevedad para coordinar la entrega de tus productos.</p>
+            <p>Tu pago ha sido procesado exitosamente. Ya estamos preparando tu pedido.</p>
+
+            <div id="resumen-compra" style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left; display: none; color: #333;">
+                <h3 style="margin-top: 0; color: #222;">Detalle de tu Pedido: <span id="nro-pedido"></span></h3>
+                <ul id="lista-productos" style="padding-left: 20px; font-size: 14px;"></ul>
+                <hr style="border: 0; border-top: 1px solid #ddd; margin: 10px 0;">
+                <p style="font-weight: bold; text-align: right; margin: 0;">Total abonado: $<span id="total-abonado"></span></p>
+            </div>
             
             <a href="/" class="btn-volver">VOLVER A LA TIENDA</a>
         </div>
