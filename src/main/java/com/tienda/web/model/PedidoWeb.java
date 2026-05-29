@@ -46,16 +46,28 @@ public class PedidoWeb {
     private String idTransaccionFiserv;
     private String medioPago;
 
+    @Column(name = "created_at")
+    private java.time.LocalDateTime createdAt;
+
     @PrePersist
     protected void onCreate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         this.fechaPedido = LocalDate.now().format(formatter);
+        this.createdAt = java.time.LocalDateTime.now(java.time.ZoneId.of("America/Buenos_Aires"));
 
         if (this.estado == null)
             this.estado = "PENDIENTE_PAGO";
     }
 
     // Getters y Setters
+    public java.time.LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(java.time.LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public Long getId() {
         return id;
     }

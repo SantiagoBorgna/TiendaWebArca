@@ -69,16 +69,27 @@ public class PedidoWebController {
                     .collect(Collectors.joining(" | "));
             pedido.setResumenArticulos(resumen);
 
-            // IMPORTANTE: NO DESCONTAMOS STOCK ACÁ. Se descuenta cuando Fiserv aprueba (o aprobación manual por transferencia).
-            // Validamos stock pero no lo restamos de la DB todavía.
+            // IMPORTANTE: DESCONTAMOS STOCK ACÁ al momento de crear el pedido (Reserva de stock).
             for (ItemPedidoDto item : datos.items()) {
                 var articulo = articuloRepository.findById(item.id())
                         .orElseThrow(() -> new RuntimeException("Artículo no encontrado: " + item.id()));
 
-                int totalStock = articulo.getCant1() + articulo.getCant3();
+                int cant1 = articulo.getCant1();
+                int cant3 = articulo.getCant3();
+                int totalStock = cant1 + cant3;
+
                 if (totalStock < item.cantidad()) {
                     throw new RuntimeException("Sin stock suficiente para: " + articulo.getNombre());
                 }
+
+                if (cant1 >= item.cantidad()) {
+                    articulo.setCant1(cant1 - item.cantidad());
+                } else {
+                    int restante = item.cantidad() - cant1;
+                    articulo.setCant1(0);
+                    articulo.setCant3(cant3 - restante);
+                }
+                articuloRepository.save(articulo);
             }
 
             if ("transferencia".equalsIgnoreCase(datos.medioPago())) {
@@ -149,39 +160,13 @@ public class PedidoWebController {
                 if (!"PAGADO".equals(pedido.getEstado())) {
                     pedido.setEstado("PAGADO");
                     
-                    // Descontamos stock leyendo el resumen encubierto: Silla x2 (id:4) | Mesa x1 (id:8)
-                    String resumen = pedido.getResumenArticulos();
-                    if (resumen != null) {
-                        String[] items = resumen.split("\\|");
-                        for (String item : items) {
-                            try {
-                                int xIndex = item.lastIndexOf("x");
-                                int parenIndex = item.lastIndexOf("(id:");
-                                int closeIndex = item.lastIndexOf(")");
-                                
-                                if (xIndex != -1 && parenIndex != -1 && closeIndex != -1) {
-                                    String cantStr = item.substring(xIndex + 1, parenIndex).trim();
-                                    String idStr = item.substring(parenIndex + 4, closeIndex).trim();
-                                    
-                                    int cantidad = Integer.parseInt(cantStr);
-                                    Integer idArt = Integer.parseInt(idStr);
-                                    
-                                    articuloRepository.findById(idArt).ifPresent(articulo -> {
-                                        if (articulo.getCant1() >= cantidad) {
-                                            articulo.setCant1(articulo.getCant1() - cantidad);
-                                        } else {
-                                            int restante = cantidad - articulo.getCant1();
-                                            articulo.setCant1(0);
-                                            articulo.setCant3(articulo.getCant3() - restante);
-                                        }
-                                        articuloRepository.save(articulo);
-                                    });
-                                }
-                            } catch (Exception ignored) { }
-                        }
+                    String ipgTxnId = allParams.get("ipgTransactionId");
+                    if (ipgTxnId != null) {
+                        pedido.setIdTransaccionFiserv(ipgTxnId);
                     }
+                    
                     pedidoRepository.save(pedido);
-                    System.out.println("Pedido " + idPedido + " PAGADO y stock actualizado.");
+                    System.out.println("Pedido " + idPedido + " PAGADO. (Stock ya fue reservado en checkout).");
                 }
             });
         }
@@ -197,8 +182,12 @@ public class PedidoWebController {
         
         if (idPedido != null) {
             pedidoRepository.findById(idPedido).ifPresent(pedido -> {
-                pedido.setEstado("FALLIDO");
-                pedidoRepository.save(pedido);
+                if ("PENDIENTE_PAGO".equals(pedido.getEstado())) {
+                    pedido.setEstado("FALLIDO");
+                    reponerStockDeResumen(pedido);
+                    pedidoRepository.save(pedido);
+                    System.out.println("Pedido " + idPedido + " FALLIDO. Stock devuelto a inventario.");
+                }
             });
         }
         
@@ -216,45 +205,51 @@ public class PedidoWebController {
         
         if (idPedido != null) {
             pedidoRepository.findById(idPedido).ifPresent(pedido -> {
-                    // Si el pedido ya está pagado por el front (retorno-exito), lo ignoramos.
-                    if (!"PAGADO".equals(pedido.getEstado())) {
+                    if ("APPROVED".equalsIgnoreCase(status) && !"PAGADO".equals(pedido.getEstado())) {
                         pedido.setEstado("PAGADO");
                         
-                        // Descontar stock
-                        String resumen = pedido.getResumenArticulos();
-                        if (resumen != null) {
-                            String[] items = resumen.split("\\|");
-                            for (String item : items) {
-                                try {
-                                    int xIndex = item.lastIndexOf("x");
-                                    int parenIndex = item.lastIndexOf("(id:");
-                                    int closeIndex = item.lastIndexOf(")");
-                                    
-                                    if (xIndex != -1 && parenIndex != -1 && closeIndex != -1) {
-                                        String cantStr = item.substring(xIndex + 1, parenIndex).trim();
-                                        String idStr = item.substring(parenIndex + 4, closeIndex).trim();
-                                        
-                                        int cantidad = Integer.parseInt(cantStr);
-                                        Integer idArt = Integer.parseInt(idStr);
-                                        
-                                        articuloRepository.findById(idArt).ifPresent(articulo -> {
-                                            if (articulo.getCant1() >= cantidad) {
-                                                articulo.setCant1(articulo.getCant1() - cantidad);
-                                            } else {
-                                                int restante = cantidad - articulo.getCant1();
-                                                articulo.setCant1(0);
-                                                articulo.setCant3(articulo.getCant3() - restante);
-                                            }
-                                            articuloRepository.save(articulo);
-                                        });
-                                    }
-                                } catch (Exception ignored) { }
-                            }
+                        String ipgTxnId = allParams.get("ipgTransactionId");
+                        if (ipgTxnId != null) {
+                            pedido.setIdTransaccionFiserv(ipgTxnId);
                         }
+                        
                         pedidoRepository.save(pedido);
-                        System.out.println("Pedido " + idPedido + " PAGADO via WEBHOOK y stock actualizado.");
+                        System.out.println("Pedido " + idPedido + " PAGADO via WEBHOOK.");
+                    } else if ("DECLINED".equalsIgnoreCase(status) && "PENDIENTE_PAGO".equals(pedido.getEstado())) {
+                        pedido.setEstado("FALLIDO");
+                        reponerStockDeResumen(pedido);
+                        pedidoRepository.save(pedido);
+                        System.out.println("Pedido " + idPedido + " FALLIDO via WEBHOOK. Stock devuelto a inventario.");
                     }
                 });
+        }
+    }
+
+    public void reponerStockDeResumen(PedidoWeb pedido) {
+        String resumen = pedido.getResumenArticulos();
+        if (resumen != null) {
+            String[] items = resumen.split("\\|");
+            for (String item : items) {
+                try {
+                    int xIndex = item.lastIndexOf("x");
+                    int parenIndex = item.lastIndexOf("(id:");
+                    int closeIndex = item.lastIndexOf(")");
+                    
+                    if (xIndex != -1 && parenIndex != -1 && closeIndex != -1) {
+                        String cantStr = item.substring(xIndex + 1, parenIndex).trim();
+                        String idStr = item.substring(parenIndex + 4, closeIndex).trim();
+                        
+                        int cantidad = Integer.parseInt(cantStr);
+                        Integer idArt = Integer.parseInt(idStr);
+                        
+                        articuloRepository.findById(idArt).ifPresent(articulo -> {
+                            int cant1Actual = articulo.getCant1();
+                            articulo.setCant1(cant1Actual + cantidad);
+                            articuloRepository.save(articulo);
+                        });
+                    }
+                } catch (Exception ignored) { }
+            }
         }
     }
 }
