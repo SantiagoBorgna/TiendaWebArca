@@ -117,9 +117,7 @@ public class PedidoWebController {
             respuesta.put("threeDSRequestorChallengeIndicator", "01");
             respuesta.put("transactionNotificationURL", urlWebhook);
             respuesta.put("oid", oid);
-            if (datos.numberOfInstallments() != null && datos.numberOfInstallments() > 1) {
-                respuesta.put("numberOfInstallments", datos.numberOfInstallments());
-            }
+            respuesta.put("numberOfInstallments", (datos.numberOfInstallments() != null && datos.numberOfInstallments() >= 1) ? datos.numberOfInstallments() : 1);
             respuesta.put("txntype", "sale");
 
             // ESPÍA SEGURO PARA LOS LOGS DE RAILWAY

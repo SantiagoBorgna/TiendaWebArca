@@ -48,15 +48,12 @@ public class PaymentService {
             String transactionNotificationURL = "https://elarcahome.com.ar/api/pedidos/webhook-fiserv";
             String txntype = "sale";
             
+            String cuotasStr = (cuotas != null && cuotas >= 1) ? String.valueOf(cuotas) : "1";
+            
             String cadenaAEnciptar = "";
             
-            if (cuotas != null && cuotas > 1) {
-                // Orden alfabético: authenticateTransaction, chargetotal, checkoutoption, currency, hash_algorithm, numberOfInstallments, oid, responseFailURL, responseSuccessURL, storename, threeDSRequestorChallengeIndicator, timezone, transactionNotificationURL, txndatetime, txntype
-                cadenaAEnciptar = authenticateTransaction + "|" + montoTotal + "|" + checkoutoption + "|" + CURRENCY + "|" + hashAlgorithm + "|" + cuotas + "|" + oid + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + threeDSRequestorChallengeIndicator + "|" + timezone + "|" + transactionNotificationURL + "|" + fechaHora + "|" + txntype;
-            } else {
-                // Orden alfabético sin cuotas
-                cadenaAEnciptar = authenticateTransaction + "|" + montoTotal + "|" + checkoutoption + "|" + CURRENCY + "|" + hashAlgorithm + "|" + oid + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + threeDSRequestorChallengeIndicator + "|" + timezone + "|" + transactionNotificationURL + "|" + fechaHora + "|" + txntype;
-            }
+            // Orden alfabético: authenticateTransaction, chargetotal, checkoutoption, currency, hash_algorithm, numberOfInstallments, oid, responseFailURL, responseSuccessURL, storename, threeDSRequestorChallengeIndicator, timezone, transactionNotificationURL, txndatetime, txntype
+            cadenaAEnciptar = authenticateTransaction + "|" + montoTotal + "|" + checkoutoption + "|" + CURRENCY + "|" + hashAlgorithm + "|" + cuotasStr + "|" + oid + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + threeDSRequestorChallengeIndicator + "|" + timezone + "|" + transactionNotificationURL + "|" + fechaHora + "|" + txntype;
 
             System.out.println("🔒 Generando HMAC Hash Extendido para: " + cadenaAEnciptar);
 

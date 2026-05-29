@@ -340,12 +340,9 @@ async function enviarPedidoAlBackend(metodo) {
             authenticateTransaction: data.authenticateTransaction,
             threeDSRequestorChallengeIndicator: data.threeDSRequestorChallengeIndicator,
             transactionNotificationURL: data.transactionNotificationURL,
-            oid: data.oid
+            oid: data.oid,
+            numberOfInstallments: data.numberOfInstallments
         };
-
-        if (data.numberOfInstallments) {
-            params.numberOfInstallments = data.numberOfInstallments;
-        }
 
         console.log("Creando formulario con estos datos:", params);
 
