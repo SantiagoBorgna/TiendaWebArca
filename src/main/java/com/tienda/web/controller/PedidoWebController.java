@@ -87,6 +87,8 @@ public class PedidoWebController {
                 pedido.setEstado("PENDIENTE_PAGO");
             }
 
+            pedidoRepository.save(pedido);
+
             // URLs con ID inyectado en el path (El Caballo de Troya que ya probamos que Fiserv no rechaza y devuelve exitosamente)
             String urlExito = "https://elarcahome.com.ar/api/pedidos/retorno-exito/" + pedido.getId();
             String urlFallo = "https://elarcahome.com.ar/api/pedidos/retorno-fallo/" + pedido.getId();
