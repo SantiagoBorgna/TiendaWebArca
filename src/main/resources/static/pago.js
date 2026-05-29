@@ -337,7 +337,10 @@ async function enviarPedidoAlBackend(metodo) {
             timezone: data.timezone,
             checkoutoption: data.checkoutoption,
             numberOfInstallments: cuotasSeleccionadas,
-            txntype: data.txntype
+            txntype: data.txntype,
+            authenticateTransaction: data.authenticateTransaction,
+            threeDSRequestorChallengeIndicator: data.threeDSRequestorChallengeIndicator,
+            transactionNotificationURL: data.transactionNotificationURL
         };
 
         console.log("Creando formulario con estos datos:", inputs);

@@ -89,13 +89,14 @@ public class PedidoWebController {
 
             pedidoRepository.save(pedido);
 
-            // URLs personalizadas (El Caballo de Troya con el idPedido pero limpio para evitar ValidationError)
-            String urlExito = "https://elarcahome.com.ar/api/pedidos/retorno-exito/" + pedido.getId();
-            String urlFallo = "https://elarcahome.com.ar/api/pedidos/retorno-fallo/" + pedido.getId();
+            // URLs estándar (para enviar al front)
+            String urlExito = "https://elarcahome.com.ar/api/pedidos/retorno-exito";
+            String urlFallo = "https://elarcahome.com.ar/api/pedidos/retorno-fallo";
+            String urlWebhook = "https://elarcahome.com.ar/api/pedidos/webhook-fiserv";
 
             String montoFormateado = String.format("%.2f", pedido.getTotalFinal()).replace(",", ".");
             String fechaHora = ZonedDateTime.now(ZoneId.of("America/Buenos_Aires")).format(DateTimeFormatter.ofPattern("yyyy:MM:dd-HH:mm:ss"));
-            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora, datos.numberOfInstallments(), urlExito, urlFallo);
+            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora, datos.numberOfInstallments());
 
             // RESPONDEMOS AL FRONTEND CON EL JSON COMPLETO
             Map<String, Object> respuesta = new HashMap<>();
@@ -111,6 +112,9 @@ public class PedidoWebController {
             respuesta.put("hash_algorithm", "HMACSHA256");
             respuesta.put("timezone", "America/Buenos_Aires");
             respuesta.put("checkoutoption", "combinedpage");
+            respuesta.put("authenticateTransaction", "true");
+            respuesta.put("threeDSRequestorChallengeIndicator", "01");
+            respuesta.put("transactionNotificationURL", urlWebhook);
             if (datos.numberOfInstallments() != null && datos.numberOfInstallments() > 1) {
                 respuesta.put("numberOfInstallments", datos.numberOfInstallments());
             }
@@ -136,9 +140,9 @@ public class PedidoWebController {
     // El frontend hará fetch a este endpoint cuando Fiserv retorne.
     // Aunque normalmente Fiserv hace un form POST directo al Controller que devuelve una vista,
     // nosotros lo vamos a interceptar.
-    @PostMapping(value = "/retorno-exito/{idPedido}", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/retorno-exito", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @Transactional
-    public void pagoExitoso(@RequestParam Map<String, String> allParams, @PathVariable(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+    public void pagoExitoso(@RequestParam Map<String, String> allParams, @RequestParam(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         System.out.println("====== FISERV PAGO EXITOSO ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
         
@@ -187,9 +191,9 @@ public class PedidoWebController {
         response.sendRedirect("/exito.html");
     }
 
-    @PostMapping(value = "/retorno-fallo/{idPedido}", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/retorno-fallo", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @Transactional
-    public void pagoFallido(@RequestParam Map<String, String> allParams, @PathVariable(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+    public void pagoFallido(@RequestParam Map<String, String> allParams, @RequestParam(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         System.out.println("====== FISERV PAGO FALLIDO ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
         
@@ -201,5 +205,13 @@ public class PedidoWebController {
         }
         
         response.sendRedirect("/fallo.html");
+    }
+
+    @PostMapping(value = "/webhook-fiserv", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @Transactional
+    public void webhookFiserv(@RequestParam Map<String, String> allParams) {
+        System.out.println("====== FISERV WEBHOOK NOTIFICATION ======");
+        allParams.forEach((k, v) -> System.out.println(k + ": " + v));
+        // TODO: En la próxima semana implementaremos la asignación del pedido a través del OrderId.
     }
 }

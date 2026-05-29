@@ -33,26 +33,29 @@ public class PaymentService {
         }
     }
 
-    public String crearHashExtendido(String montoTotal, String fechaHora, Integer cuotas, String successUrl, String failUrl) {
+    public String crearHashExtendido(String montoTotal, String fechaHora, Integer cuotas) {
         try {
             // Documentación Fiserv: Hash Extendido HMAC-SHA256. 
             // Se deben ordenar los NOMBRES de los parámetros a enviar alfabéticamente.
             
-            String responseFailURL = failUrl;
-            String responseSuccessURL = successUrl;
-            String hashAlgorithm = "HMACSHA256";
-            String timezone = "America/Buenos_Aires";
+            String authenticateTransaction = "true";
             String checkoutoption = "combinedpage";
+            String hashAlgorithm = "HMACSHA256";
+            String responseFailURL = "https://elarcahome.com.ar/api/pedidos/retorno-fallo";
+            String responseSuccessURL = "https://elarcahome.com.ar/api/pedidos/retorno-exito";
+            String threeDSRequestorChallengeIndicator = "01";
+            String timezone = "America/Buenos_Aires";
+            String transactionNotificationURL = "https://elarcahome.com.ar/api/pedidos/webhook-fiserv";
             String txntype = "sale";
             
             String cadenaAEnciptar = "";
             
             if (cuotas != null && cuotas > 1) {
-                // Orden: chargetotal, checkoutoption, currency, hash_algorithm, numberOfInstallments, responseFailURL, responseSuccessURL, storename, timezone, txndatetime, txntype
-                cadenaAEnciptar = montoTotal + "|" + checkoutoption + "|" + CURRENCY + "|" + hashAlgorithm + "|" + cuotas + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + timezone + "|" + fechaHora + "|" + txntype;
+                // Orden alfabético: authenticateTransaction, chargetotal, checkoutoption, currency, hash_algorithm, numberOfInstallments, responseFailURL, responseSuccessURL, storename, threeDSRequestorChallengeIndicator, timezone, transactionNotificationURL, txndatetime, txntype
+                cadenaAEnciptar = authenticateTransaction + "|" + montoTotal + "|" + checkoutoption + "|" + CURRENCY + "|" + hashAlgorithm + "|" + cuotas + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + threeDSRequestorChallengeIndicator + "|" + timezone + "|" + transactionNotificationURL + "|" + fechaHora + "|" + txntype;
             } else {
-                // Orden sin cuotas: chargetotal, checkoutoption, currency, hash_algorithm, responseFailURL, responseSuccessURL, storename, timezone, txndatetime, txntype
-                cadenaAEnciptar = montoTotal + "|" + checkoutoption + "|" + CURRENCY + "|" + hashAlgorithm + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + timezone + "|" + fechaHora + "|" + txntype;
+                // Orden alfabético sin cuotas
+                cadenaAEnciptar = authenticateTransaction + "|" + montoTotal + "|" + checkoutoption + "|" + CURRENCY + "|" + hashAlgorithm + "|" + responseFailURL + "|" + responseSuccessURL + "|" + storeId + "|" + threeDSRequestorChallengeIndicator + "|" + timezone + "|" + transactionNotificationURL + "|" + fechaHora + "|" + txntype;
             }
 
             System.out.println("🔒 Generando HMAC Hash Extendido para: " + cadenaAEnciptar);
