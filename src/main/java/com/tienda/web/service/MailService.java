@@ -24,6 +24,7 @@ public class MailService {
         // Ejecutamos en otro hilo para no bloquear la respuesta HTTP
         CompletableFuture.runAsync(() -> {
             try {
+                System.out.println("Iniciando envío asíncrono de correo a: " + pedido.getEmail());
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -39,8 +40,8 @@ public class MailService {
 
                 mailSender.send(message);
                 System.out.println("Correo enviado exitosamente a: " + pedido.getEmail());
-            } catch (MessagingException e) {
-                System.err.println("Error al enviar el correo a " + pedido.getEmail());
+            } catch (Exception e) {
+                System.err.println("¡CRÍTICO! Error al enviar el correo a " + pedido.getEmail());
                 e.printStackTrace();
             }
         });
