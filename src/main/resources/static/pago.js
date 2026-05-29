@@ -340,7 +340,6 @@ async function enviarPedidoAlBackend(metodo) {
             authenticateTransaction: data.authenticateTransaction,
             threeDSRequestorChallengeIndicator: data.threeDSRequestorChallengeIndicator,
             transactionNotificationURL: data.transactionNotificationURL,
-            oid: data.oid,
             numberOfInstallments: data.numberOfInstallments
         };
 

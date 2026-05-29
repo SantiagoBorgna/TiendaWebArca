@@ -87,17 +87,14 @@ public class PedidoWebController {
                 pedido.setEstado("PENDIENTE_PAGO");
             }
 
-            pedidoRepository.save(pedido);
-
-            // URLs estándar (para enviar al front)
-            String urlExito = "https://elarcahome.com.ar/api/pedidos/retorno-exito";
-            String urlFallo = "https://elarcahome.com.ar/api/pedidos/retorno-fallo";
-            String urlWebhook = "https://elarcahome.com.ar/api/pedidos/webhook-fiserv";
+            // URLs con ID inyectado en el path (El Caballo de Troya que ya probamos que Fiserv no rechaza y devuelve exitosamente)
+            String urlExito = "https://elarcahome.com.ar/api/pedidos/retorno-exito/" + pedido.getId();
+            String urlFallo = "https://elarcahome.com.ar/api/pedidos/retorno-fallo/" + pedido.getId();
+            String urlWebhook = "https://elarcahome.com.ar/api/pedidos/webhook-fiserv/" + pedido.getId();
 
             String montoFormateado = String.format("%.2f", pedido.getTotalFinal()).replace(",", ".");
             String fechaHora = ZonedDateTime.now(ZoneId.of("America/Buenos_Aires")).format(DateTimeFormatter.ofPattern("yyyy:MM:dd-HH:mm:ss"));
-            String oid = String.valueOf(pedido.getId());
-            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora, datos.numberOfInstallments(), oid);
+            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora, datos.numberOfInstallments(), urlExito, urlFallo, urlWebhook);
 
             // RESPONDEMOS AL FRONTEND CON EL JSON COMPLETO
             Map<String, Object> respuesta = new HashMap<>();
@@ -116,7 +113,6 @@ public class PedidoWebController {
             respuesta.put("authenticateTransaction", "true");
             respuesta.put("threeDSRequestorChallengeIndicator", "01");
             respuesta.put("transactionNotificationURL", urlWebhook);
-            respuesta.put("oid", oid);
             respuesta.put("numberOfInstallments", (datos.numberOfInstallments() != null && datos.numberOfInstallments() >= 1) ? datos.numberOfInstallments() : 1);
             respuesta.put("txntype", "sale");
 
@@ -140,17 +136,14 @@ public class PedidoWebController {
     // El frontend hará fetch a este endpoint cuando Fiserv retorne.
     // Aunque normalmente Fiserv hace un form POST directo al Controller que devuelve una vista,
     // nosotros lo vamos a interceptar.
-    @PostMapping(value = "/retorno-exito", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/retorno-exito/{idPedido}", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @Transactional
-    public void pagoExitoso(@RequestParam Map<String, String> allParams, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+    public void pagoExitoso(@RequestParam Map<String, String> allParams, @PathVariable(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         System.out.println("====== FISERV PAGO EXITOSO ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
         
-        String oidStr = allParams.get("oid");
-        if (oidStr != null) {
-            try {
-                Long idPedido = Long.parseLong(oidStr);
-                pedidoRepository.findById(idPedido).ifPresent(pedido -> {
+        if (idPedido != null) {
+            pedidoRepository.findById(idPedido).ifPresent(pedido -> {
                 if (!"PAGADO".equals(pedido.getEstado())) {
                     pedido.setEstado("PAGADO");
                     
@@ -189,46 +182,38 @@ public class PedidoWebController {
                     System.out.println("Pedido " + idPedido + " PAGADO y stock actualizado.");
                 }
             });
-            } catch (NumberFormatException ignored) {}
         }
         
         response.sendRedirect("/exito.html");
     }
 
-    @PostMapping(value = "/retorno-fallo", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/retorno-fallo/{idPedido}", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @Transactional
-    public void pagoFallido(@RequestParam Map<String, String> allParams, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+    public void pagoFallido(@RequestParam Map<String, String> allParams, @PathVariable(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         System.out.println("====== FISERV PAGO FALLIDO ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
         
-        String oidStr = allParams.get("oid");
-        if (oidStr != null) {
-            try {
-                Long idPedido = Long.parseLong(oidStr);
-                pedidoRepository.findById(idPedido).ifPresent(pedido -> {
-                    pedido.setEstado("FALLIDO");
-                    pedidoRepository.save(pedido);
-                });
-            } catch (NumberFormatException ignored) {}
+        if (idPedido != null) {
+            pedidoRepository.findById(idPedido).ifPresent(pedido -> {
+                pedido.setEstado("FALLIDO");
+                pedidoRepository.save(pedido);
+            });
         }
         
         response.sendRedirect("/fallo.html");
     }
 
-    @PostMapping(value = "/webhook-fiserv", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/webhook-fiserv/{idPedido}", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @Transactional
-    public void webhookFiserv(@RequestParam Map<String, String> allParams) {
+    public void webhookFiserv(@RequestParam Map<String, String> allParams, @PathVariable(value = "idPedido", required = false) Long idPedido) {
         System.out.println("====== FISERV WEBHOOK NOTIFICATION ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
         
-        String oidStr = allParams.get("oid");
         String txntype = allParams.get("txntype");
         String status = allParams.get("status"); // IPG Connect a veces manda status=APPROVED
         
-        if (oidStr != null) {
-            try {
-                Long idPedido = Long.parseLong(oidStr);
-                pedidoRepository.findById(idPedido).ifPresent(pedido -> {
+        if (idPedido != null) {
+            pedidoRepository.findById(idPedido).ifPresent(pedido -> {
                     // Si el pedido ya está pagado por el front (retorno-exito), lo ignoramos.
                     if (!"PAGADO".equals(pedido.getEstado())) {
                         pedido.setEstado("PAGADO");
@@ -268,7 +253,6 @@ public class PedidoWebController {
                         System.out.println("Pedido " + idPedido + " PAGADO via WEBHOOK y stock actualizado.");
                     }
                 });
-            } catch (NumberFormatException ignored) {}
         }
     }
 }
