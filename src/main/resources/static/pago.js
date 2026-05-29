@@ -103,7 +103,7 @@ function actualizarPrecioPantalla() {
         const envioStr = localStorage.getItem("precioEnvio");
         const costoEnvio = envioStr ? parseFloat(envioStr) || 0 : 0;
         
-        let total = totalBase + costoEnvio;
+        let total = totalBase + costoEnvio; // Se inicializa
         interesAplicado = 0;
         descuentoAplicado = 0;
 
@@ -111,8 +111,8 @@ function actualizarPrecioPantalla() {
         const panelCuotas = document.getElementById("panel-tarjeta");
 
         if (medioPagoSeleccionado === "transferencia") {
-            descuentoAplicado = total * 0.20;
-            total = total - descuentoAplicado;
+            descuentoAplicado = totalBase * 0.20;
+            total = (totalBase - descuentoAplicado) + costoEnvio;
             
             // Ocultar selector si es transferencia (por bug visual que detectó el usuario)
             if (panelCuotas) panelCuotas.style.display = "none";
@@ -121,11 +121,11 @@ function actualizarPrecioPantalla() {
             if (panelCuotas) panelCuotas.style.display = "block";
             
             if (cuotasSeleccionadas === 3) {
-                interesAplicado = total * 0.15;
+                interesAplicado = totalBase * 0.15;
             } else if (cuotasSeleccionadas === 6) {
-                interesAplicado = total * 0.30;
+                interesAplicado = totalBase * 0.30;
             }
-            total = total + interesAplicado;
+            total = (totalBase + interesAplicado) + costoEnvio;
         }
 
         const divTotal = document.getElementById("total-final-pantalla");
