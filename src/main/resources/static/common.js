@@ -334,7 +334,7 @@ function renderizarCarrito() {
 
     document.getElementById("carrito-subtotal").innerHTML = `
         <h3>Total: $${total.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
-        <p>O $${(total*0.8).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} con Transferencia</p>
+        <p>O $${((subtotal*0.8) + precioCobrado).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} con Transferencia</p>
     `;
 
     const cpGuardado = localStorage.getItem("codigoPostal");
