@@ -103,7 +103,7 @@ function actualizarPrecioPantalla() {
         const envioStr = localStorage.getItem("precioEnvio");
         const costoEnvio = envioStr ? parseFloat(envioStr) || 0 : 0;
         
-        let total = totalBase + costoEnvio; // Se inicializa
+        let total = totalBase;
         interesAplicado = 0;
         descuentoAplicado = 0;
 
@@ -280,11 +280,12 @@ async function enviarPedidoAlBackend(metodo) {
         }
 
         // Armar el objeto final
-        let totalRecalculado = totalProductos + costoEnvio;
+        //let totalRecalculado = totalProductos + costoEnvio;
+        let totalRecalculado = totalProductos;
         if (medioPagoSeleccionado === "transferencia") {
-            totalRecalculado = totalRecalculado - descuentoAplicado;
+            totalRecalculado = (totalRecalculado - descuentoAplicado) + costoEnvio;
         } else {
-            totalRecalculado = totalRecalculado + interesAplicado;
+            totalRecalculado = (totalRecalculado + interesAplicado) + costoEnvio;
         }
 
         const pedidoData = {
