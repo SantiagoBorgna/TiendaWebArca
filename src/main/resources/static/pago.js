@@ -325,31 +325,35 @@ async function enviarPedidoAlBackend(metodo) {
         form.action = data.urlFiserv;
 
         // Estos son los campos obligatorios que Fiserv necesita para identificar la compra
-        const inputs = {
+        const params = {
             storename: data.storename,
-            txndatetime: data.txndatetime,
+            timezone: data.timezone,
             chargetotal: data.chargetotal,
             currency: data.currency,
-            hashExtended: data.hashExtended,
+            txntype: data.txntype,
+            txndatetime: data.txndatetime,
             hash_algorithm: data.hash_algorithm,
+            hashExtended: data.hashExtended,
+            checkoutoption: data.checkoutoption,
             responseSuccessURL: data.responseSuccessURL,
             responseFailURL: data.responseFailURL,
-            timezone: data.timezone,
-            checkoutoption: data.checkoutoption,
-            numberOfInstallments: cuotasSeleccionadas,
-            txntype: data.txntype,
             authenticateTransaction: data.authenticateTransaction,
             threeDSRequestorChallengeIndicator: data.threeDSRequestorChallengeIndicator,
-            transactionNotificationURL: data.transactionNotificationURL
+            transactionNotificationURL: data.transactionNotificationURL,
+            oid: data.oid
         };
 
-        console.log("Creando formulario con estos datos:", inputs);
+        if (data.numberOfInstallments) {
+            params.numberOfInstallments = data.numberOfInstallments;
+        }
 
-        for (const key in inputs) {
+        console.log("Creando formulario con estos datos:", params);
+
+        for (const key in params) {
             const input = document.createElement("input");
             input.type = "hidden";
             input.name = key;
-            input.value = inputs[key];
+            input.value = params[key];
             form.appendChild(input);
         }
 

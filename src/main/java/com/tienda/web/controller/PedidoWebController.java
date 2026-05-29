@@ -96,7 +96,8 @@ public class PedidoWebController {
 
             String montoFormateado = String.format("%.2f", pedido.getTotalFinal()).replace(",", ".");
             String fechaHora = ZonedDateTime.now(ZoneId.of("America/Buenos_Aires")).format(DateTimeFormatter.ofPattern("yyyy:MM:dd-HH:mm:ss"));
-            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora, datos.numberOfInstallments());
+            String oid = String.valueOf(pedido.getId());
+            String hash = paymentService.crearHashExtendido(montoFormateado, fechaHora, datos.numberOfInstallments(), oid);
 
             // RESPONDEMOS AL FRONTEND CON EL JSON COMPLETO
             Map<String, Object> respuesta = new HashMap<>();
@@ -115,6 +116,7 @@ public class PedidoWebController {
             respuesta.put("authenticateTransaction", "true");
             respuesta.put("threeDSRequestorChallengeIndicator", "01");
             respuesta.put("transactionNotificationURL", urlWebhook);
+            respuesta.put("oid", oid);
             if (datos.numberOfInstallments() != null && datos.numberOfInstallments() > 1) {
                 respuesta.put("numberOfInstallments", datos.numberOfInstallments());
             }
@@ -142,12 +144,15 @@ public class PedidoWebController {
     // nosotros lo vamos a interceptar.
     @PostMapping(value = "/retorno-exito", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @Transactional
-    public void pagoExitoso(@RequestParam Map<String, String> allParams, @RequestParam(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+    public void pagoExitoso(@RequestParam Map<String, String> allParams, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         System.out.println("====== FISERV PAGO EXITOSO ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
         
-        if (idPedido != null) {
-            pedidoRepository.findById(idPedido).ifPresent(pedido -> {
+        String oidStr = allParams.get("oid");
+        if (oidStr != null) {
+            try {
+                Long idPedido = Long.parseLong(oidStr);
+                pedidoRepository.findById(idPedido).ifPresent(pedido -> {
                 if (!"PAGADO".equals(pedido.getEstado())) {
                     pedido.setEstado("PAGADO");
                     
@@ -186,6 +191,7 @@ public class PedidoWebController {
                     System.out.println("Pedido " + idPedido + " PAGADO y stock actualizado.");
                 }
             });
+            } catch (NumberFormatException ignored) {}
         }
         
         response.sendRedirect("/exito.html");
@@ -193,15 +199,19 @@ public class PedidoWebController {
 
     @PostMapping(value = "/retorno-fallo", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @Transactional
-    public void pagoFallido(@RequestParam Map<String, String> allParams, @RequestParam(value = "idPedido", required = false) Long idPedido, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+    public void pagoFallido(@RequestParam Map<String, String> allParams, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
         System.out.println("====== FISERV PAGO FALLIDO ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
         
-        if (idPedido != null) {
-            pedidoRepository.findById(idPedido).ifPresent(pedido -> {
-                pedido.setEstado("FALLIDO");
-                pedidoRepository.save(pedido);
-            });
+        String oidStr = allParams.get("oid");
+        if (oidStr != null) {
+            try {
+                Long idPedido = Long.parseLong(oidStr);
+                pedidoRepository.findById(idPedido).ifPresent(pedido -> {
+                    pedido.setEstado("FALLIDO");
+                    pedidoRepository.save(pedido);
+                });
+            } catch (NumberFormatException ignored) {}
         }
         
         response.sendRedirect("/fallo.html");
@@ -212,6 +222,55 @@ public class PedidoWebController {
     public void webhookFiserv(@RequestParam Map<String, String> allParams) {
         System.out.println("====== FISERV WEBHOOK NOTIFICATION ======");
         allParams.forEach((k, v) -> System.out.println(k + ": " + v));
-        // TODO: En la próxima semana implementaremos la asignación del pedido a través del OrderId.
+        
+        String oidStr = allParams.get("oid");
+        String txntype = allParams.get("txntype");
+        String status = allParams.get("status"); // IPG Connect a veces manda status=APPROVED
+        
+        if (oidStr != null) {
+            try {
+                Long idPedido = Long.parseLong(oidStr);
+                pedidoRepository.findById(idPedido).ifPresent(pedido -> {
+                    // Si el pedido ya está pagado por el front (retorno-exito), lo ignoramos.
+                    if (!"PAGADO".equals(pedido.getEstado())) {
+                        pedido.setEstado("PAGADO");
+                        
+                        // Descontar stock
+                        String resumen = pedido.getResumenArticulos();
+                        if (resumen != null) {
+                            String[] items = resumen.split("\\|");
+                            for (String item : items) {
+                                try {
+                                    int xIndex = item.lastIndexOf("x");
+                                    int parenIndex = item.lastIndexOf("(id:");
+                                    int closeIndex = item.lastIndexOf(")");
+                                    
+                                    if (xIndex != -1 && parenIndex != -1 && closeIndex != -1) {
+                                        String cantStr = item.substring(xIndex + 1, parenIndex).trim();
+                                        String idStr = item.substring(parenIndex + 4, closeIndex).trim();
+                                        
+                                        int cantidad = Integer.parseInt(cantStr);
+                                        Integer idArt = Integer.parseInt(idStr);
+                                        
+                                        articuloRepository.findById(idArt).ifPresent(articulo -> {
+                                            if (articulo.getCant1() >= cantidad) {
+                                                articulo.setCant1(articulo.getCant1() - cantidad);
+                                            } else {
+                                                int restante = cantidad - articulo.getCant1();
+                                                articulo.setCant1(0);
+                                                articulo.setCant3(articulo.getCant3() - restante);
+                                            }
+                                            articuloRepository.save(articulo);
+                                        });
+                                    }
+                                } catch (Exception ignored) { }
+                            }
+                        }
+                        pedidoRepository.save(pedido);
+                        System.out.println("Pedido " + idPedido + " PAGADO via WEBHOOK y stock actualizado.");
+                    }
+                });
+            } catch (NumberFormatException ignored) {}
+        }
     }
 }
