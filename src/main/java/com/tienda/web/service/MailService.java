@@ -1,47 +1,53 @@
 package com.tienda.web.service;
 
 import com.tienda.web.model.PedidoWeb;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class MailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
-
-    @Value("${spring.mail.username}")
-    private String senderEmail;
+    @Value("${resend.api.key}")
+    private String resendApiKey;
 
     public void enviarMailConfirmacionAsync(PedidoWeb pedido, boolean esTransferencia) {
         // Ejecutamos en otro hilo para no bloquear la respuesta HTTP
         CompletableFuture.runAsync(() -> {
             try {
-                System.out.println("Iniciando envío asíncrono de correo a: " + pedido.getEmail());
-                MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-                helper.setFrom(senderEmail);
-                helper.setTo(pedido.getEmail());
+                System.out.println("Iniciando envío asíncrono de correo via Resend a: " + pedido.getEmail());
+                
+                RestTemplate restTemplate = new RestTemplate();
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                headers.set("Authorization", "Bearer " + resendApiKey);
 
                 String subject = esTransferencia ? "Confirmación de Pedido - Pendiente de Transferencia (#" + pedido.getId() + ")" 
                                                  : "¡Pago Exitoso! Tu pedido en El Arca Home (#" + pedido.getId() + ")";
-                helper.setSubject(subject);
-
+                
                 String htmlMsg = generarCuerpoHtml(pedido, esTransferencia);
-                helper.setText(htmlMsg, true);
 
-                mailSender.send(message);
-                System.out.println("Correo enviado exitosamente a: " + pedido.getEmail());
+                Map<String, Object> body = new HashMap<>();
+                body.put("from", "ventas@elarcahome.com.ar"); 
+                body.put("to", pedido.getEmail());
+                body.put("subject", subject);
+                body.put("html", htmlMsg);
+
+                HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+                
+                ResponseEntity<String> response = restTemplate.postForEntity("https://api.resend.com/emails", request, String.class);
+                
+                System.out.println("Correo enviado exitosamente via Resend a: " + pedido.getEmail() + " - Code: " + response.getStatusCode());
             } catch (Exception e) {
-                System.err.println("¡CRÍTICO! Error al enviar el correo a " + pedido.getEmail());
+                System.err.println("¡CRÍTICO! Error al enviar el correo vía Resend a " + pedido.getEmail());
                 e.printStackTrace();
             }
         });
