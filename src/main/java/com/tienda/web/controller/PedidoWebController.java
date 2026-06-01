@@ -210,7 +210,7 @@ public class PedidoWebController {
         
         if (idPedido != null) {
             pedidoRepository.findById(idPedido).ifPresent(pedido -> {
-                    if ("APPROVED".equalsIgnoreCase(status) && !"PAGADO".equals(pedido.getEstado())) {
+                    if (("APPROVED".equalsIgnoreCase(status) || "APROBADO".equalsIgnoreCase(status)) && !"PAGADO".equals(pedido.getEstado())) {
                         pedido.setEstado("PAGADO");
                         
                         String ipgTxnId = allParams.get("ipgTransactionId");

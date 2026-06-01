@@ -110,9 +110,8 @@
 
                     const costoEnvioVal = parseFloat(localStorage.getItem("precioEnvio"));
                     if (costoEnvioVal > 0) {
-                        const transportistaStr = localStorage.getItem("nombreTransportista") || "Envío a domicilio";
                         const liEnvio = document.createElement("li");
-                        liEnvio.textContent = `1x Costo de Envío (${transportistaStr}) - $${costoEnvioVal.toLocaleString("es-AR", {minimumFractionDigits: 2})}`;
+                        liEnvio.textContent = `Costo de envío - $${costoEnvioVal.toLocaleString("es-AR", {minimumFractionDigits: 2})}`;
                         ul.appendChild(liEnvio);
                     }
                 } catch(e) {}
