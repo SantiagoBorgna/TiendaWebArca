@@ -207,13 +207,17 @@ public class PedidoWebController {
         
         String txntype = allParams.get("txntype");
         String status = allParams.get("status"); // IPG Connect a veces manda status=APPROVED
+        String processorResponse = allParams.get("processor_response_code");
+        
+        boolean isApproved = "APPROVED".equalsIgnoreCase(status) || "APROBADO".equalsIgnoreCase(status) || "00".equals(processorResponse);
+        boolean isDeclined = "DECLINED".equalsIgnoreCase(status) || "RECHAZADO".equalsIgnoreCase(status) || (!"00".equals(processorResponse) && processorResponse != null);
         
         if (idPedido != null) {
             pedidoRepository.findById(idPedido).ifPresent(pedido -> {
-                    if (("APPROVED".equalsIgnoreCase(status) || "APROBADO".equalsIgnoreCase(status)) && !"PAGADO".equals(pedido.getEstado())) {
+                    if (isApproved && !"PAGADO".equals(pedido.getEstado())) {
                         pedido.setEstado("PAGADO");
                         
-                        String ipgTxnId = allParams.get("ipgTransactionId");
+                        String ipgTxnId = allParams.get("ipgTransactionId") != null ? allParams.get("ipgTransactionId") : allParams.get("endpointTransactionId");
                         if (ipgTxnId != null) {
                             pedido.setIdTransaccionFiserv(ipgTxnId);
                         }
@@ -221,11 +225,13 @@ public class PedidoWebController {
                         pedidoRepository.save(pedido);
                         mailService.enviarMailConfirmacionAsync(pedido, false);
                         System.out.println("Pedido " + idPedido + " PAGADO via WEBHOOK. Correo enviado.");
-                    } else if ("DECLINED".equalsIgnoreCase(status) && "PENDIENTE_PAGO".equals(pedido.getEstado())) {
+                    } else if (isDeclined && "PENDIENTE_PAGO".equals(pedido.getEstado())) {
                         pedido.setEstado("FALLIDO");
                         reponerStockDeResumen(pedido);
                         pedidoRepository.save(pedido);
                         System.out.println("Pedido " + idPedido + " FALLIDO via WEBHOOK. Stock devuelto a inventario.");
+                    } else {
+                        System.out.println("Webhook ignorado para pedido " + idPedido + ". Estado actual: " + pedido.getEstado() + ". isApproved: " + isApproved);
                     }
                 });
         }
