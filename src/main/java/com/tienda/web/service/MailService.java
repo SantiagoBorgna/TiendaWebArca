@@ -21,28 +21,30 @@ public class MailService {
     private String senderEmail;
 
     public void enviarMailConfirmacionAsync(PedidoWeb pedido, boolean esTransferencia) {
-        // Temporalmente sincrónico para forzar el logueo de errores en el request thread
-        try {
-            System.out.println("Iniciando envío de correo a: " + pedido.getEmail());
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        // Ejecutamos en otro hilo para no bloquear la respuesta HTTP
+        CompletableFuture.runAsync(() -> {
+            try {
+                System.out.println("Iniciando envío asíncrono de correo a: " + pedido.getEmail());
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(senderEmail);
-            helper.setTo(pedido.getEmail());
+                helper.setFrom(senderEmail);
+                helper.setTo(pedido.getEmail());
 
-            String subject = esTransferencia ? "Confirmación de Pedido - Pendiente de Transferencia (#" + pedido.getId() + ")" 
-                                             : "¡Pago Exitoso! Tu pedido en El Arca Home (#" + pedido.getId() + ")";
-            helper.setSubject(subject);
+                String subject = esTransferencia ? "Confirmación de Pedido - Pendiente de Transferencia (#" + pedido.getId() + ")" 
+                                                 : "¡Pago Exitoso! Tu pedido en El Arca Home (#" + pedido.getId() + ")";
+                helper.setSubject(subject);
 
-            String htmlMsg = generarCuerpoHtml(pedido, esTransferencia);
-            helper.setText(htmlMsg, true);
+                String htmlMsg = generarCuerpoHtml(pedido, esTransferencia);
+                helper.setText(htmlMsg, true);
 
-            mailSender.send(message);
-            System.out.println("Correo enviado exitosamente a: " + pedido.getEmail());
-        } catch (Exception e) {
-            System.err.println("¡CRÍTICO! Error al enviar el correo a " + pedido.getEmail());
-            e.printStackTrace();
-        }
+                mailSender.send(message);
+                System.out.println("Correo enviado exitosamente a: " + pedido.getEmail());
+            } catch (Exception e) {
+                System.err.println("¡CRÍTICO! Error al enviar el correo a " + pedido.getEmail());
+                e.printStackTrace();
+            }
+        });
     }
 
     private String generarCuerpoHtml(PedidoWeb pedido, boolean esTransferencia) {
