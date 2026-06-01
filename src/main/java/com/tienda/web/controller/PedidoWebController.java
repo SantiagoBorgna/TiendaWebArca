@@ -98,7 +98,6 @@ public class PedidoWebController {
             if ("transferencia".equalsIgnoreCase(datos.medioPago())) {
                 pedido.setEstado("PENDIENTE_TRANSFERENCIA");
                 pedidoRepository.save(pedido);
-                mailService.enviarMailConfirmacionAsync(pedido, true);
             } else {
                 pedido.setEstado("PENDIENTE_PAGO");
                 pedidoRepository.save(pedido);
