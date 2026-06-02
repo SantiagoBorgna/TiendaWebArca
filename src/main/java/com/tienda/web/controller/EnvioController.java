@@ -1,5 +1,6 @@
 package com.tienda.web.controller;
 
+import com.tienda.web.service.PaqarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,9 @@ public class EnvioController {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    
+    @Autowired
+    private PaqarService paqarService;
 
     @GetMapping("/calcular")
     public Map<String, Object> calcularEnvio(@RequestParam String cp, @RequestParam Double peso) {
@@ -42,26 +46,21 @@ public class EnvioController {
             }
         }
 
-        return calcularCorreoArgentino(peso);
+        return calcularCorreoArgentino(cpLimpio, peso);
     }
 
-    private Map<String, Object> calcularCorreoArgentino(Double peso) {
-        double precio;
-
-        if (peso < 1)
-            precio = 6800.0;
-        else if (peso < 5)
-            precio = 8500.0;
-        else if (peso < 10)
-            precio = 11500.0;
-        else if (peso < 15)
-            precio = 14200.0;
-        else
-            precio = 18000.0;
+    private Map<String, Object> calcularCorreoArgentino(String cpDestino, Double peso) {
+        
+        Double precioCotizado = paqarService.cotizarEnvio(cpDestino, peso);
+        
+        if (precioCotizado == null) {
+            // Fallback
+            precioCotizado = paqarService.cotizarContingencia(peso);
+        }
 
         return Map.of(
                 "nombreTransportista", "Correo Argentino",
-                "costo", precio,
+                "costo", precioCotizado,
                 "mensaje", "📦 Envío Nacional (Correo Argentino)",
                 "tipo", "correo");
     }

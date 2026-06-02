@@ -55,42 +55,50 @@ public class MailService {
 
     private String generarCuerpoHtml(PedidoWeb pedido, boolean esTransferencia) {
         StringBuilder html = new StringBuilder();
-        html.append("<html><body style='font-family: Arial, sans-serif; color: #333;'>");
+        html.append("<html><body style='font-family: \"Inter\", Arial, sans-serif; background-color: #f9f9f9; color: #111; padding: 20px 0;'>");
         
-        html.append("<div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>");
+        html.append("<div style='max-width: 600px; margin: 0 auto; background-color: #fff; padding: 40px 30px; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);'>");
         
-        html.append("<h2 style='color: #4CAF50; text-align: center;'>El Arca Home</h2>");
+        html.append("<div style='text-align: center; margin-bottom: 30px;'>");
+        html.append("<img src='https://elarcahome.com.ar/images/logo-arca.png' alt='El Arca Home' style='max-width: 150px; height: auto;' />");
+        html.append("</div>");
         
         if (esTransferencia) {
-            html.append("<h3 style='text-align: center;'>¡Gracias por tu compra, ").append(pedido.getNombreCliente()).append("!</h3>");
-            html.append("<p>Tu pedido <strong>#").append(pedido.getId()).append("</strong> ha sido registrado correctamente.</p>");
-            html.append("<p>Al haber seleccionado pago por transferencia bancaria, estamos a la espera de que nos envíes el comprobante para procesar tu pedido.</p>");
+            html.append("<h2 style='text-align: center; color: #111; font-size: 24px; font-weight: 700; margin-bottom: 10px;'>¡Gracias por tu compra, ").append(pedido.getNombreCliente()).append("!</h2>");
+            html.append("<p style='text-align: center; font-size: 16px; color: #555; line-height: 1.5;'>Tu pedido <strong>#").append(pedido.getId()).append("</strong> ha sido registrado correctamente.</p>");
+            html.append("<p style='text-align: center; font-size: 16px; color: #555; line-height: 1.5;'>Al haber seleccionado pago por transferencia bancaria, estamos a la espera de que nos envíes el comprobante para procesar tu pedido.</p>");
         } else {
-            html.append("<h3 style='text-align: center;'>¡Pago exitoso, ").append(pedido.getNombreCliente()).append("!</h3>");
-            html.append("<p>Tu pedido <strong>#").append(pedido.getId()).append("</strong> ha sido pagado y confirmado. ¡Ya estamos preparando todo!</p>");
+            html.append("<h2 style='text-align: center; color: #111; font-size: 24px; font-weight: 700; margin-bottom: 10px;'>¡Pago exitoso, ").append(pedido.getNombreCliente()).append("!</h2>");
+            html.append("<p style='text-align: center; font-size: 16px; color: #555; line-height: 1.5;'>Tu pedido <strong>#").append(pedido.getId()).append("</strong> ha sido pagado y confirmado. ¡Ya estamos preparando todo!</p>");
         }
 
-        html.append("<hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>");
+        html.append("<hr style='border: 0; border-top: 1px solid #eaeaea; margin: 30px 0;'>");
         
-        html.append("<h4>Resumen de tu compra:</h4>");
-        html.append("<ul>");
+        html.append("<h4 style='color: #111; font-size: 18px; margin-bottom: 15px;'>Resumen de tu compra</h4>");
         
-        // Formatear el resumen que viene en formato "Silla x2 (id:4) | Mesa x1 (id:8)"
+        html.append("<div style='background-color: #fcfcfc; border: 1px solid #f0f0f0; border-radius: 8px; padding: 20px;'>");
+        html.append("<ul style='list-style-type: none; padding: 0; margin: 0;'>");
+        
         if (pedido.getResumenArticulos() != null) {
             String[] items = pedido.getResumenArticulos().split("\\|");
             for (String item : items) {
-                // Limpiar el (id:X) para el cliente
                 String itemLimpio = item.replaceAll("\\(id:\\d+\\)", "").trim();
-                html.append("<li>").append(itemLimpio).append("</li>");
+                html.append("<li style='padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 15px; color: #333;'>").append(itemLimpio).append("</li>");
             }
         }
+        
+        String tipoEnvio = pedido.getMetodoEnvio() != null ? pedido.getMetodoEnvio() : "Retiro en local";
+        html.append("<li style='padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 15px; color: #333;'><strong>Envío:</strong> ").append(tipoEnvio).append("</li>");
+        html.append("<li style='padding: 12px 0 0 0; font-size: 18px; color: #111; font-weight: bold; text-align: right;'>Total: $").append(String.format("%,.2f", pedido.getTotalFinal()).replace(",", "X").replace(".", ",").replace("X", ".")).append("</li>");
         html.append("</ul>");
+        html.append("</div>");
 
-        html.append("<p><strong>Envío:</strong> ").append(pedido.getMetodoEnvio() != null ? pedido.getMetodoEnvio() : "Retiro en local").append("</p>");
-        html.append("<p><strong>Total abonado:</strong> $").append(String.format("%.2f", pedido.getTotalFinal())).append("</p>");
+        html.append("<div style='margin-top: 40px; text-align: center;'>");
+        html.append("<a href='https://elarcahome.com.ar' style='background-color: #111; color: #fff; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;'>Volver a la tienda</a>");
+        html.append("</div>");
 
-        html.append("<hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>");
-        html.append("<p style='font-size: 12px; color: #777; text-align: center;'>Este es un correo automático, por favor no respondas a esta dirección.</p>");
+        html.append("<hr style='border: 0; border-top: 1px solid #eaeaea; margin: 40px 0 20px 0;'>");
+        html.append("<p style='font-size: 12px; color: #999; text-align: center; margin: 0;'>Este es un correo automático de El Arca Home, por favor no respondas a esta dirección.</p>");
         
         html.append("</div></body></html>");
         
