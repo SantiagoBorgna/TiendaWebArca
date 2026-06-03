@@ -352,6 +352,8 @@ function renderizarCarrito() {
             actualizarNombreTransporte(label, nombreTransportista);
             if (!isNaN(costoEnvioCalculado)) {
                 spanPrecio.textContent = `$${costoEnvioCalculado.toLocaleString('es-AR')}`;
+            } else {
+                spanPrecio.textContent = "";
             }
         } else {
             actualizarNombreTransporte(label, "Envío a domicilio");
@@ -369,7 +371,13 @@ function renderizarCarrito() {
         if (metodoEnvio === "envio-domicilio" && nombreTransportista) {
             mostrarMensajeTransporte(nombreTransportista);
         } else {
-            mensajeEnvio.textContent = ""; 
+            const errorMsg = localStorage.getItem("mensajeErrorEnvio");
+            if(errorMsg && costoEnvioCalculado && isNaN(costoEnvioCalculado)) {
+                mensajeEnvio.innerHTML = `<b>${errorMsg}</b>`;
+                mensajeEnvio.style.color = "red";
+            } else {
+                mensajeEnvio.textContent = ""; 
+            }
         }
     }
 
@@ -459,26 +467,43 @@ async function calcularEnvio() {
         const precioFinal = data.costo;
         const nombreTransporte = data.nombreTransportista;
 
-        if(spanPrecio) {
-            spanPrecio.textContent = `$${precioFinal.toLocaleString('es-AR')}`;
-            spanPrecio.style.fontWeight = "bold";
-        }
+        if (data.tipo === "error") {
+            if(spanPrecio) spanPrecio.textContent = "";
+            if (typeof actualizarNombreTransporte === "function" && labelDomicilio) {
+                actualizarNombreTransporte(labelDomicilio, nombreTransporte);
+            }
+            if(radioDomicilio) radioDomicilio.checked = false;
 
-        if (typeof actualizarNombreTransporte === "function" && labelDomicilio) {
-            actualizarNombreTransporte(labelDomicilio, nombreTransporte);
-        }
+            mensaje.innerHTML = `<b>${data.mensaje}</b>`;
+            mensaje.style.color = "red";
 
-        if(radioDomicilio) radioDomicilio.checked = true;
+            localStorage.setItem("codigoPostal", cp);
+            localStorage.setItem("nombreTransportista", nombreTransporte); 
+            localStorage.setItem("costoEnvioCalculado", "error");  
+            localStorage.setItem("metodoEnvio", ""); 
+            localStorage.setItem("precioEnvio", 0); 
+            localStorage.setItem("mensajeErrorEnvio", data.mensaje);
+        } else {
+            if(spanPrecio) {
+                spanPrecio.textContent = `$${precioFinal.toLocaleString('es-AR')}`;
+                spanPrecio.style.fontWeight = "bold";
+            }
 
-        mensaje.innerHTML = `<b>${nombreTransporte}</b>: ${data.mensaje}`;
-        mensaje.style.color = data.tipo === "lancioni" ? "#28a745" : "#004b8d";
+            if (typeof actualizarNombreTransporte === "function" && labelDomicilio) {
+                actualizarNombreTransporte(labelDomicilio, nombreTransporte);
+            }
 
-        // Persistencia
-        localStorage.setItem("codigoPostal", cp);
-        localStorage.setItem("nombreTransportista", nombreTransporte); 
-        localStorage.setItem("costoEnvioCalculado", precioFinal);  
-        localStorage.setItem("metodoEnvio", "envio-domicilio"); 
-        localStorage.setItem("precioEnvio", precioFinal); 
+            if(radioDomicilio) radioDomicilio.checked = true;
+
+            mensaje.innerHTML = `<b>${nombreTransporte}</b>: ${data.mensaje}`;
+            mensaje.style.color = data.tipo === "lancioni" ? "#28a745" : "#004b8d";
+
+            localStorage.setItem("codigoPostal", cp);
+            localStorage.setItem("nombreTransportista", nombreTransporte); 
+            localStorage.setItem("costoEnvioCalculado", precioFinal);  
+            localStorage.setItem("metodoEnvio", "envio-domicilio"); 
+            localStorage.setItem("precioEnvio", precioFinal); 
+        } 
         
         if (typeof renderizarCarrito === "function") renderizarCarrito();
 

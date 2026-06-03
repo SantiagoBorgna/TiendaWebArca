@@ -150,45 +150,59 @@ async function calcularEnvioResumen() {
         const precioFinal = data.costo;
         const nombreTransporte = data.nombreTransportista;
 
-        // 4. Actualización Visual (UI)
-        
-        // Precio del envío
-        if(spanPrecio) {
-            spanPrecio.textContent = `$${precioFinal.toLocaleString('es-AR')}`;
-        }
+        if (data.tipo === "error") {
+            if(spanPrecio) spanPrecio.textContent = "";
 
-        // Seleccionar radio button
-        if(radioDomicilio) {
-            radioDomicilio.checked = true;
-            const label = radioDomicilio.closest("label");
-            // Usamos tu función auxiliar para actualizar el texto del label
-            if (typeof actualizarTextoLabel === 'function') {
-                actualizarTextoLabel(label, nombreTransporte);
-            }
-        }
-
-        // Mostrar mensaje (Podés adaptar mostrarMensajeResumen para que use data.mensaje si querés más detalle)
-        if (typeof mostrarMensajeResumen === 'function') {
-            mostrarMensajeResumen(nombreTransporte); 
-        } else {
-            // Fallback si no existe la función
+            if(radioDomicilio) radioDomicilio.checked = false;
+            
             const msgDiv = document.getElementById("mensaje-envio");
             if(msgDiv) {
-                msgDiv.innerHTML = data.mensaje;
-                msgDiv.style.color = data.tipo === "lancioni" ? "green" : "#004b8d";
+                msgDiv.innerHTML = `<b>${data.mensaje}</b>`;
+                msgDiv.style.color = "red";
             }
-        }
 
-        // 5. Persistencia
-        localStorage.setItem("codigoPostal", cp);
-        localStorage.setItem("nombreTransportista", nombreTransporte);
-        localStorage.setItem("costoEnvioCalculado", precioFinal);
-        localStorage.setItem("metodoEnvio", "envio-domicilio");
-        localStorage.setItem("precioEnvio", precioFinal);
+            localStorage.setItem("codigoPostal", cp);
+            localStorage.setItem("nombreTransportista", nombreTransporte);
+            localStorage.setItem("costoEnvioCalculado", "error");
+            localStorage.setItem("metodoEnvio", "");
+            localStorage.setItem("precioEnvio", 0);
+            localStorage.setItem("mensajeErrorEnvio", data.mensaje);
 
-        // 6. Actualizar el Total Final (Suma productos + envío)
-        if (typeof actualizarTotales === 'function') {
-            actualizarTotales(precioFinal);
+            if (typeof actualizarTotales === 'function') {
+                actualizarTotales(0, true);
+            }
+        } else {
+            if(spanPrecio) {
+                spanPrecio.textContent = `$${precioFinal.toLocaleString('es-AR')}`;
+            }
+
+            if(radioDomicilio) {
+                radioDomicilio.checked = true;
+                const label = radioDomicilio.closest("label");
+                if (typeof actualizarTextoLabel === 'function') {
+                    actualizarTextoLabel(label, nombreTransporte);
+                }
+            }
+
+            if (typeof mostrarMensajeResumen === 'function') {
+                mostrarMensajeResumen(data); 
+            } else {
+                const msgDiv = document.getElementById("mensaje-envio");
+                if(msgDiv) {
+                    msgDiv.innerHTML = data.mensaje;
+                    msgDiv.style.color = data.tipo === "lancioni" ? "green" : "#004b8d";
+                }
+            }
+
+            localStorage.setItem("codigoPostal", cp);
+            localStorage.setItem("nombreTransportista", nombreTransporte);
+            localStorage.setItem("costoEnvioCalculado", precioFinal);
+            localStorage.setItem("metodoEnvio", "envio-domicilio");
+            localStorage.setItem("precioEnvio", precioFinal);
+
+            if (typeof actualizarTotales === 'function') {
+                actualizarTotales(precioFinal, false);
+            }
         }
 
     } catch (error) {
@@ -206,7 +220,7 @@ async function calcularEnvioResumen() {
     }
 }
 
-function actualizarTotales(costoEnvio = 0) {
+function actualizarTotales(costoEnvio = 0, isError = false) {
     let subtotal = 0;
     carrito.forEach((item) => {
         subtotal += item.precioVenta * item.cantidad;
@@ -223,7 +237,8 @@ function actualizarTotales(costoEnvio = 0) {
     if(subtotalEl) subtotalEl.textContent = formatearMoneda(subtotal);
     
     if(envioEl) {
-        if(costoEnvio === 0) envioEl.textContent = "Gratis";
+        if(isError) envioEl.textContent = "A convenir";
+        else if(costoEnvio === 0) envioEl.textContent = "Gratis";
         else envioEl.textContent = formatearMoneda(costoEnvio);
     }
 
@@ -243,15 +258,18 @@ function actualizarTextoLabel(label, nuevoTexto) {
     });
 }
 
-function mostrarMensajeResumen(nombreTransporte) {
+function mostrarMensajeResumen(data) {
     const mensaje = document.getElementById("mensaje-envio");
     if(!mensaje) return;
     
-    if (nombreTransporte.includes("Lancioni")) {
-        mensaje.innerHTML = `Envío a cargo de <b>${nombreTransporte}</b>`;
+    if (data.tipo === "error") {
+        mensaje.innerHTML = `<b>${data.mensaje}</b>`;
+        mensaje.style.color = "red";
+    } else if (data.nombreTransportista && data.nombreTransportista.includes("Lancioni")) {
+        mensaje.innerHTML = `Envío a cargo de <b>${data.nombreTransportista}</b>`;
         mensaje.style.color = "green";
     } else {
-        mensaje.innerHTML = `Envío a cargo de <b>${nombreTransporte}</b>`;
+        mensaje.innerHTML = `Envío a cargo de <b>${data.nombreTransportista}</b>`;
         mensaje.style.color = "#004b8d";
     }
 }
