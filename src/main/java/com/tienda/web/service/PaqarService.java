@@ -6,30 +6,70 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
 public class PaqarService {
 
-    @Value("${paqar.api.key:}")
-    private String apiKey;
-
-    @Value("${paqar.agreement.id:}")
-    private String agreementId;
+    // Credenciales de MiCorreo
+    private final String micorreoUser = "MBrocheroOttaAPI";
+    private final String micorreoPass = "Ropero03+";
 
     @Value("${paqar.cp.origen:5986}")
     private String cpOrigen;
 
-    private static final String PAQAR_API_URL = "https://api.correoargentino.com.ar/api/v2/rates";
+    private static final String LOGIN_URL = "https://micorreo.correoargentino.com.ar/api/login"; // URL estimativa
+    private static final String RATES_URL = "https://micorreo.correoargentino.com.ar/api/rates"; // URL estimativa
+    
+    private String tokenJwt = null;
+    private long tokenExpiracion = 0;
 
     /**
-     * Intenta cotizar con la API de Correo Argentino.
-     * Si no hay credenciales o la API falla, devuelve null para que el Controller use el fallback.
+     * Obtiene el token de autenticación de MiCorreo y lo almacena en caché temporalmente
+     */
+    private synchronized String obtenerToken() {
+        if (tokenJwt != null && System.currentTimeMillis() < tokenExpiracion) {
+            return tokenJwt;
+        }
+        
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, String> body = new HashMap<>();
+            body.put("username", micorreoUser);
+            body.put("password", micorreoPass);
+
+            HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+            
+            ResponseEntity<Map> response = restTemplate.postForEntity(LOGIN_URL, request, Map.class);
+            
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                Map<String, Object> respBody = response.getBody();
+                if (respBody.containsKey("token")) {
+                    tokenJwt = respBody.get("token").toString();
+                    // Expiración por defecto 2 horas (7200000 ms)
+                    tokenExpiracion = System.currentTimeMillis() + 7200000;
+                    System.out.println("✅ Autenticado en MiCorreo exitosamente.");
+                    return tokenJwt;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error al autenticar en MiCorreo (Puede que la URL sea distinta): " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Intenta cotizar con la API de Correo Argentino usando JWT Token.
      */
     public Double cotizarEnvio(String cpDestino, Double pesoKg) {
-        if (apiKey == null || apiKey.isEmpty() || agreementId == null || agreementId.isEmpty()) {
-            System.out.println("⚠️ Credenciales de Paq.ar no configuradas. Usando tabla de contingencia.");
+        
+        String token = obtenerToken();
+        
+        if (token == null) {
+            System.out.println("⚠️ No se pudo obtener Token. Usando tabla de contingencia de Correo Argentino.");
             return null;
         }
 
@@ -37,12 +77,8 @@ public class PaqarService {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            
-            // Paq.ar API v2 usa típicamente estos headers para la autorización corporativa
-            headers.set("api-key", apiKey);
-            headers.set("agreement-id", agreementId);
+            headers.setBearerAuth(token);
 
-            // Armamos el JSON de cotización estándar (ajustable según el manual definitivo)
             Map<String, Object> body = new HashMap<>();
             
             Map<String, Object> sender = new HashMap<>();
@@ -52,10 +88,8 @@ public class PaqarService {
             receiver.put("zipCode", cpDestino);
             
             Map<String, Object> paquete = new HashMap<>();
-            // Paq.ar suele requerir el peso en gramos en algunas APIs, o en KG. Usamos KG por defecto.
             paquete.put("weight", pesoKg);
-            // Volumen genérico mínimo si no se pide dimensiones
-            paquete.put("volume", 0.01);
+            paquete.put("volume", 0.01); // Volumen estimado obligatorio en algunas APIs
 
             body.put("sender", sender);
             body.put("receiver", receiver);
@@ -63,11 +97,9 @@ public class PaqarService {
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
             
-            ResponseEntity<Map> response = restTemplate.postForEntity(PAQAR_API_URL, request, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(RATES_URL, request, Map.class);
             
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                // Parseamos la respuesta (La estructura exacta dependerá del manual final)
-                // Usualmente devuelve algo como { "rate": 8500.0, "deliveryTime": 3 }
                 Map<String, Object> respBody = response.getBody();
                 
                 if (respBody.containsKey("rate")) {
@@ -77,14 +109,14 @@ public class PaqarService {
                 }
             }
         } catch (Exception e) {
-            System.err.println("❌ Error comunicándose con la API de Paq.ar: " + e.getMessage());
+            System.err.println("❌ Error cotizando en MiCorreo: " + e.getMessage());
         }
 
-        return null;
+        return null; // Fallback
     }
 
     /**
-     * Tabla de precios hardcodeada como Plan B por si la API se cae o no hay credenciales.
+     * Tabla de precios hardcodeada como Plan B por si la API se cae.
      */
     public Double cotizarContingencia(Double peso) {
         if (peso < 1) return 6800.0;
