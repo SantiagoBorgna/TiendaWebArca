@@ -54,8 +54,11 @@ public class EnvioController {
         Double precioCotizado = paqarService.cotizarEnvio(cpDestino, peso);
         
         if (precioCotizado == null) {
-            // Fallback
-            precioCotizado = paqarService.cotizarContingencia(peso);
+            return Map.of(
+                    "nombreTransportista", "Correo Argentino",
+                    "costo", 0.0,
+                    "mensaje", "No disponible en este momento, por favor comunicarse por whatsapp",
+                    "tipo", "error");
         }
 
         return Map.of(
