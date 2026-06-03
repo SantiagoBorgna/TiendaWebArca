@@ -48,8 +48,8 @@ public class MailService {
 
                 // --- ALERTA A LA DUEÑA ---
                 String subjectDuena = "NUEVA VENTA ONLINE - Pedido #" + pedido.getId();
-                String htmlDuena = "<html><body style='font-family: Arial;'><h2 style='color:green;'>¡Ingresó una nueva venta!</h2>"
-                                 + "<p>El cliente <b>" + pedido.getNombreCliente() + "</b> acaba de realizar un pedido por <b>$" + String.format("%,.2f", pedido.getTotalFinal()).replace(",", "X").replace(".", ",").replace("X", ".") + "</b>.</p>"
+                String htmlDuena = "<html><body style='font-family: Arial;'><h2 style='color:#111;'>Ingresó un nuevo pedido</h2>"
+                                 + "<p>El cliente <b>" + pedido.getNombreCliente() + " " + pedido.getApellidoCliente() + "</b> acaba de realizar un pedido por <b>$" + String.format("%,.2f", pedido.getTotalFinal()).replace(",", "X").replace(".", ",").replace("X", ".") + "</b>.</p>"
                                  + "<p>Por favor, revisá el sistema para ver los detalles y procesar el envío/retiro.</p></body></html>";
 
                 Map<String, Object> bodyDuena = new HashMap<>();
