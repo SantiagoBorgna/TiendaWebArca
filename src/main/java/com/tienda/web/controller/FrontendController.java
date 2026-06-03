@@ -43,4 +43,19 @@ public class FrontendController {
     public String pagoCompra() {
         return "forward:/pago.html";
     }
+
+    @GetMapping("/exito")
+    public String exito() {
+        return "forward:/exito.html";
+    }
+
+    @GetMapping("/fallo")
+    public String fallo() {
+        return "forward:/fallo.html";
+    }
+
+    @GetMapping("/transferencia")
+    public String transferencia() {
+        return "forward:/transferencia_exitosa.html";
+    }
 }

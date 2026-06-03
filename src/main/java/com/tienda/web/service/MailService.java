@@ -44,10 +44,26 @@ public class MailService {
                 HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
                 
                 ResponseEntity<String> response = restTemplate.postForEntity("https://api.resend.com/emails", request, String.class);
-                
                 System.out.println("Correo enviado exitosamente via Resend a: " + pedido.getEmail() + " - Code: " + response.getStatusCode());
+
+                // --- ALERTA A LA DUEÑA ---
+                String subjectDuena = "NUEVA VENTA ONLINE - Pedido #" + pedido.getId();
+                String htmlDuena = "<html><body style='font-family: Arial;'><h2 style='color:green;'>¡Ingresó una nueva venta!</h2>"
+                                 + "<p>El cliente <b>" + pedido.getNombreCliente() + "</b> acaba de realizar un pedido por <b>$" + String.format("%,.2f", pedido.getTotalFinal()).replace(",", "X").replace(".", ",").replace("X", ".") + "</b>.</p>"
+                                 + "<p>Por favor, revisá el sistema para ver los detalles y procesar el envío/retiro.</p></body></html>";
+
+                Map<String, Object> bodyDuena = new HashMap<>();
+                bodyDuena.put("from", "ventas@elarcahome.com.ar"); 
+                bodyDuena.put("to", "elarcahome.deco@gmail.com");
+                bodyDuena.put("subject", subjectDuena);
+                bodyDuena.put("html", htmlDuena);
+
+                HttpEntity<Map<String, Object>> requestDuena = new HttpEntity<>(bodyDuena, headers);
+                restTemplate.postForEntity("https://api.resend.com/emails", requestDuena, String.class);
+                System.out.println("Alerta enviada a la dueña exitosamente.");
+
             } catch (Exception e) {
-                System.err.println("¡CRÍTICO! Error al enviar el correo vía Resend a " + pedido.getEmail());
+                System.err.println("¡CRÍTICO! Error al enviar los correos vía Resend a " + pedido.getEmail());
                 e.printStackTrace();
             }
         });

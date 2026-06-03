@@ -320,7 +320,7 @@ async function enviarPedidoAlBackend(metodo) {
         localStorage.setItem("ultimoPedidoItems", JSON.stringify(itemsDto));
 
         if (medioPagoSeleccionado === "transferencia") {
-            window.location.href = "/transferencia_exitosa.html";
+            window.location.href = "/transferencia";
             return;
         }
 

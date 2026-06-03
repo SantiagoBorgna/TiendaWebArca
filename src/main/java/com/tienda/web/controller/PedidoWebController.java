@@ -175,7 +175,7 @@ public class PedidoWebController {
             });
         }
         
-        response.sendRedirect("/exito.html");
+        response.sendRedirect("/exito");
     }
 
     @PostMapping(value = "/retorno-fallo/{idPedido}", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -195,7 +195,7 @@ public class PedidoWebController {
             });
         }
         
-        response.sendRedirect("/fallo.html");
+        response.sendRedirect("/fallo");
     }
 
     @PostMapping(value = "/webhook-fiserv/{idPedido}", consumes = org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE)
