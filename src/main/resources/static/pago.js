@@ -114,23 +114,42 @@ function actualizarPrecioPantalla() {
             descuentoAplicado = totalBase * 0.20;
             total = (totalBase - descuentoAplicado) + costoEnvio;
             
-            // Ocultar selector si es transferencia (por bug visual que detectó el usuario)
             if (panelCuotas) panelCuotas.style.display = "none";
         } else {
-            // Asegurar que el selector esté visible
             if (panelCuotas) panelCuotas.style.display = "block";
             
             if (cuotasSeleccionadas === 3) {
-                interesAplicado = totalBase * 0.15;
+                interesAplicado = 0; // 3 cuotas sin interes
+                total = totalBase + costoEnvio;
             } else if (cuotasSeleccionadas === 6) {
-                interesAplicado = totalBase * 0.30;
+                // 15% de interés sobre el total final (productos + envio)
+                let subtotalConEnvio = totalBase + costoEnvio;
+                interesAplicado = subtotalConEnvio * 0.15;
+                total = subtotalConEnvio + interesAplicado;
+            } else {
+                interesAplicado = 0;
+                total = totalBase + costoEnvio;
             }
-            total = (totalBase + interesAplicado) + costoEnvio;
         }
 
         const divTotal = document.getElementById("total-final-pantalla");
         if(divTotal) {
             divTotal.textContent = "$ " + total.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        
+        const divDetalleCuotas = document.getElementById("detalle-cuotas-pantalla");
+        if(divDetalleCuotas) {
+            if (medioPagoSeleccionado === "fiserv" && cuotasSeleccionadas > 1) {
+                let valorCuota = total / cuotasSeleccionadas;
+                let strCuota = "$ " + valorCuota.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                if (cuotasSeleccionadas === 3) {
+                    divDetalleCuotas.textContent = `(${cuotasSeleccionadas} cuotas sin interés de ${strCuota})`;
+                } else if (cuotasSeleccionadas === 6) {
+                    divDetalleCuotas.textContent = `(${cuotasSeleccionadas} cuotas fijas de ${strCuota})`;
+                }
+            } else {
+                divDetalleCuotas.textContent = "";
+            }
         }
     } catch (e) {
         console.error("Error calculando total:", e);
