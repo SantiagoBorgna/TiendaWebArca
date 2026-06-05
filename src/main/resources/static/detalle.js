@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p class="precio-transferencia">$${(articulo.precioVenta * 0.8).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} con Transferencia</p>
                     
                     <div class="info-pagos">
-                        <div class="info-pagos-linea"><img src="/images/credit-card.png" alt="tarjeta"><p>6 cuotas sin interés de $${(articulo.precioVenta / 6).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p></div>
+                        <div class="info-pagos-linea"><img src="/images/credit-card.png" alt="tarjeta"><p>3 cuotas sin interés de $${(articulo.precioVenta / 3).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p></div>
                         <div class="info-pagos-linea"><img src="/images/transfer-money.png" alt="transferencia"><p>20% de descuento pagando con Transferencia</p></div>
                         <div class="info-pagos-linea"><img src="/images/delivery-truck.png" alt="envios"><p>Envíos a todo el país</p></div>
                     </div>
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p class="precio-transferencia">$${(articulo.precioVenta * 0.8).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} con Transferencia</p>
                     
                     <div class="info-pagos">
-                        <div class="info-pagos-linea"><img src="/images/credit-card.png" alt="tarjeta"><p>6 cuotas sin interés de $${(articulo.precioVenta / 6).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p></div>
+                        <div class="info-pagos-linea"><img src="/images/credit-card.png" alt="tarjeta"><p>3 cuotas sin interés de $${(articulo.precioVenta / 3).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p></div>
                         <div class="info-pagos-linea"><img src="/images/transfer-money.png" alt="transferencia"><p>20% de descuento pagando con Transferencia</p></div>
                         <div class="info-pagos-linea"><img src="/images/delivery-truck.png" alt="envios"><p>Envíos a todo el país</p></div>
                     </div>
