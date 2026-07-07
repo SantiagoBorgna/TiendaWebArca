@@ -20,8 +20,8 @@ public class PaqarService {
     @Value("${paqar.cp.origen:5986}")
     private String cpOrigen;
 
-    private static final String TOKEN_URL = "https://api.correoargentino.com.ar/micorreo/v1/token";
-    private static final String RATES_URL = "https://api.correoargentino.com.ar/micorreo/v1/rates";
+    private static final String TOKEN_URL = "https://apitest.correoargentino.com.ar/micorreo/v1/token";
+    private static final String RATES_URL = "https://apitest.correoargentino.com.ar/micorreo/v1/rates";
     
     private String tokenJwt = null;
     private long tokenExpiracion = 0;
