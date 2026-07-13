@@ -20,6 +20,9 @@ public class PaqarService {
     @Value("${paqar.cp.origen:5986}")
     private String cpOrigen;
 
+    @Value("${paqar.customer.id:}")
+    private String customerId;
+
     private static final String TOKEN_URL = "https://apitest.correoargentino.com.ar/micorreo/v1/token";
     private static final String RATES_URL = "https://apitest.correoargentino.com.ar/micorreo/v1/rates";
     
@@ -75,6 +78,7 @@ public class PaqarService {
             headers.setBearerAuth(token);
 
             Map<String, Object> body = new HashMap<>();
+            body.put("customerId", customerId);
             body.put("postalCodeOrigin", cpOrigen);
             body.put("postalCodeDestination", cpDestino);
             body.put("deliveredType", "D"); // Domicilio
