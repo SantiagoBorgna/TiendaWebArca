@@ -20,7 +20,7 @@ public class PaqarService {
     @Value("${paqar.cp.origen:5986}")
     private String cpOrigen;
 
-    @Value("${paqar.customer.id:}")
+    @Value("${paqar.customer.id:0005005573}")
     private String customerId;
 
     private static final String TOKEN_URL = "https://apitest.correoargentino.com.ar/micorreo/v1/token";
