@@ -65,7 +65,7 @@ public class MailService {
                 headers.set("Authorization", "Bearer " + resendApiKey);
 
                 String subjectDuena = "NUEVA VENTA ONLINE - Pedido #" + pedido.getId();
-                String htmlDuena = "<html><body style='font-family: Arial;'><h2 style='color:#25D366;'>¡Ingresó una nueva venta!</h2>"
+                String htmlDuena = "<html><body style='font-family: Arial;'><h2 style='color:#1b9a4a;'>¡Ingresó una nueva venta!</h2>"
                                  + "<p>El cliente <b>" + pedido.getNombreCliente() + " " + pedido.getApellidoCliente() + "</b> acaba de realizar un pedido por <b>$" + String.format("%,.2f", pedido.getTotalFinal()).replace(",", "X").replace(".", ",").replace("X", ".") + "</b>.</p>"
                                  + "<p>Por favor, revisá el sistema para ver los detalles y procesar el envío/retiro.</p></body></html>";
 
