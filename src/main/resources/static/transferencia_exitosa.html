@@ -102,11 +102,23 @@
                 try {
                     const items = JSON.parse(pedidoItemsStr);
                     const ul = document.getElementById("lista-productos");
+                    let subtotalProductos = 0;
+                    
                     items.forEach(item => {
+                        const totalItem = item.cantidad * item.precio;
+                        subtotalProductos += totalItem;
                         const li = document.createElement("li");
-                        li.textContent = `${item.cantidad}x ${item.nombre} - $${(item.cantidad * item.precio).toLocaleString("es-AR", {minimumFractionDigits: 2})}`;
+                        li.textContent = `${item.cantidad}x ${item.nombre} - $${totalItem.toLocaleString("es-AR", {minimumFractionDigits: 2})}`;
                         ul.appendChild(li);
                     });
+
+                    const descuentoTransferencia = subtotalProductos * 0.20;
+                    if (descuentoTransferencia > 0) {
+                        const liDescuento = document.createElement("li");
+                        liDescuento.textContent = `-20% Pago con transferencia - -$${descuentoTransferencia.toLocaleString("es-AR", {minimumFractionDigits: 2})}`;
+                        liDescuento.style.color = "#25D366";
+                        ul.appendChild(liDescuento);
+                    }
 
                     const costoEnvioVal = parseFloat(localStorage.getItem("precioEnvio"));
                     if (costoEnvioVal > 0) {

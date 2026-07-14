@@ -47,6 +47,23 @@ public class MailService {
                 System.out.println("Correo enviado exitosamente via Resend a: " + pedido.getEmail() + " - Code: " + response.getStatusCode());
 
                 // --- ALERTA A LA DUEÑA ---
+                enviarMailNuevaVentaDuenaAsync(pedido);
+                
+            } catch (Exception e) {
+                System.err.println("Error enviando correo con Resend: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void enviarMailNuevaVentaDuenaAsync(PedidoWeb pedido) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                RestTemplate restTemplate = new RestTemplate();
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                headers.set("Authorization", "Bearer " + resendApiKey);
+
                 String subjectDuena = "NUEVA VENTA ONLINE - Pedido #" + pedido.getId();
                 String htmlDuena = "<html><body style='font-family: Arial;'><h2 style='color:#111;'>Ingresó un nuevo pedido</h2>"
                                  + "<p>El cliente <b>" + pedido.getNombreCliente() + " " + pedido.getApellidoCliente() + "</b> acaba de realizar un pedido por <b>$" + String.format("%,.2f", pedido.getTotalFinal()).replace(",", "X").replace(".", ",").replace("X", ".") + "</b>.</p>"
@@ -60,11 +77,9 @@ public class MailService {
 
                 HttpEntity<Map<String, Object>> requestDuena = new HttpEntity<>(bodyDuena, headers);
                 restTemplate.postForEntity("https://api.resend.com/emails", requestDuena, String.class);
-                System.out.println("Alerta enviada a la dueña exitosamente.");
-
+                System.out.println("Alerta de nueva venta enviada a la dueña.");
             } catch (Exception e) {
-                System.err.println("¡CRÍTICO! Error al enviar los correos vía Resend a " + pedido.getEmail());
-                e.printStackTrace();
+                System.err.println("Error enviando alerta a la dueña: " + e.getMessage());
             }
         });
     }
