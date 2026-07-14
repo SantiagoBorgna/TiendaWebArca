@@ -116,7 +116,6 @@
                     if (descuentoTransferencia > 0) {
                         const liDescuento = document.createElement("li");
                         liDescuento.textContent = `-20% Pago con transferencia - -$${descuentoTransferencia.toLocaleString("es-AR", {minimumFractionDigits: 2})}`;
-                        liDescuento.style.color = "#25D366";
                         ul.appendChild(liDescuento);
                     }
 
