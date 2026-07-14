@@ -264,19 +264,5 @@ public class PedidoWebController {
         }
     }
 
-    // Endpoint para confirmar el pago por transferencia desde un sistema externo (ej. Odoo)
-    @GetMapping("/confirmar-transferencia/{idPedido}")
-    @Transactional
-    public ResponseEntity<String> confirmarTransferencia(@PathVariable Long idPedido) {
-        return pedidoRepository.findById(idPedido).map(pedido -> {
-            if ("PENDIENTE_TRANSFERENCIA".equals(pedido.getEstado())) {
-                pedido.setEstado("PAGADO");
-                pedidoRepository.save(pedido);
-                mailService.enviarMailConfirmacionAsync(pedido, false); // false = esTransferencia(no), manda el de exito
-                return ResponseEntity.ok("Pedido " + idPedido + " marcado como PAGADO y correo enviado exitosamente al cliente.");
-            } else {
-                return ResponseEntity.badRequest().body("El pedido no estaba pendiente de transferencia o ya fue pagado.");
-            }
-        }).orElse(ResponseEntity.notFound().build());
-    }
+
 }
