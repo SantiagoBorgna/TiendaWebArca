@@ -100,7 +100,7 @@ public class MailService {
             html.append("<p style='text-align: center; font-size: 16px; color: #555; line-height: 1.5;'>Al haber seleccionado pago por transferencia bancaria, estamos a la espera de que nos envíes el comprobante para procesar tu pedido.</p>");
         } else {
             html.append("<h2 style='text-align: center; color: #111; font-size: 24px; font-weight: 700; margin-bottom: 10px;'>¡Pago exitoso, ").append(pedido.getNombreCliente()).append("!</h2>");
-            html.append("<p style='text-align: center; font-size: 16px; color: #555; line-height: 1.5;'>Tu pedido <strong>#").append(pedido.getId()).append("</strong> ha sido pagado y confirmado. ¡Ya estamos preparando todo!</p>");
+            html.append("<p style='text-align: center; font-size: 16px; color: #555; line-height: 1.5;'>Tu pedido ha sido pagado y confirmado. ¡Ya estamos preparando todo!</p>");
         }
 
         html.append("<hr style='border: 0; border-top: 1px solid #eaeaea; margin: 30px 0;'>");

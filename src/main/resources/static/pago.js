@@ -145,7 +145,7 @@ function actualizarPrecioPantalla() {
                 if (cuotasSeleccionadas === 3) {
                     divDetalleCuotas.textContent = `(${cuotasSeleccionadas} cuotas sin interés de ${strCuota})`;
                 } else if (cuotasSeleccionadas === 6) {
-                    divDetalleCuotas.textContent = `(${cuotasSeleccionadas} cuotas fijas de ${strCuota})`;
+                    divDetalleCuotas.textContent = `(${cuotasSeleccionadas} cuotas de ${strCuota})`;
                 }
             } else {
                 divDetalleCuotas.textContent = "";
