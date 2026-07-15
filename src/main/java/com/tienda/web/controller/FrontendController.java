@@ -58,4 +58,9 @@ public class FrontendController {
     public String transferencia() {
         return "forward:/transferencia_exitosa.html";
     }
+
+    @GetMapping("/terminos")
+    public String terminos() {
+        return "forward:/terminos.html";
+    }
 }
