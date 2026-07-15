@@ -9,7 +9,7 @@ public class Articulo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idArticulo")
-    private int idArticulo;
+    private Integer idArticulo;
 
     @Column(name = "nombreArticulo")
     private String nombreArticulo;
@@ -18,13 +18,13 @@ public class Articulo {
     private String descripcionArticulo;
 
     @Column(name = "cant1Articulo")
-    private int cant1Articulo;
+    private Integer cant1Articulo;
 
     @Column(name = "cant2Articulo")
-    private int cant2Articulo;
+    private Integer cant2Articulo;
 
     @Column(name = "cant3Articulo")
-    private int cant3Articulo;
+    private Integer cant3Articulo;
 
     @Column(name = "negocioArticulo")
     private String negocioArticulo;
@@ -33,10 +33,10 @@ public class Articulo {
     private String categoriaArticulo;
 
     @Column(name = "precioCompraArticulo")
-    private double precioCompraArticulo;
+    private Double precioCompraArticulo;
 
     @Column(name = "precioVentaArticulo")
-    private double precioVentaArticulo;
+    private Double precioVentaArticulo;
 
     @Column(name = "proveedorArticulo")
     private String proveedorArticulo;
@@ -57,23 +57,23 @@ public class Articulo {
     private String ciudadArticulo;
 
     @Column(name = "peso_articulo")
-    private double pesoArticulo;
+    private Double pesoArticulo;
 
     @Column(name = "alto_articulo")
-    private double altoArticulo;
+    private Double altoArticulo;
 
     @Column(name = "ancho_articulo")
-    private double anchoArticulo;
+    private Double anchoArticulo;
 
     @Column(name = "profundidad_articulo")
-    private double profundidadArticulo;
+    private Double profundidadArticulo;
 
     // Getters y Setters
     public int getId() {
-        return idArticulo;
+        return idArticulo != null ? idArticulo : 0;
     }
 
-    public void setId(int idArticulo) {
+    public void setId(Integer idArticulo) {
         this.idArticulo = idArticulo;
     }
 
@@ -94,26 +94,26 @@ public class Articulo {
     }
 
     public int getCant1() {
-        return cant1Articulo;
+        return cant1Articulo != null ? cant1Articulo : 0;
     }
 
-    public void setCant1(int cant1Articulo) {
+    public void setCant1(Integer cant1Articulo) {
         this.cant1Articulo = cant1Articulo;
     }
 
     public int getCant2() {
-        return cant2Articulo;
+        return cant2Articulo != null ? cant2Articulo : 0;
     }
 
-    public void setCant2(int cant2Articulo) {
+    public void setCant2(Integer cant2Articulo) {
         this.cant2Articulo = cant2Articulo;
     }
 
     public int getCant3() {
-        return cant3Articulo;
+        return cant3Articulo != null ? cant3Articulo : 0;
     }
 
-    public void setCant3(int cant3Articulo) {
+    public void setCant3(Integer cant3Articulo) {
         this.cant3Articulo = cant3Articulo;
     }
 
@@ -134,7 +134,7 @@ public class Articulo {
     }
 
     public double getPrecioCompra() {
-        return precioCompraArticulo;
+        return precioCompraArticulo != null ? precioCompraArticulo : 0.0;
     }
 
     public void setPrecioCompra(Double precioCompraArticulo) {
@@ -142,7 +142,7 @@ public class Articulo {
     }
 
     public double getPrecioVenta() {
-        return precioVentaArticulo;
+        return precioVentaArticulo != null ? precioVentaArticulo : 0.0;
     }
 
     public void setPrecioVenta(Double precioVentaArticulo) {
@@ -198,7 +198,7 @@ public class Articulo {
     }
 
     public double getPeso() {
-        return pesoArticulo;
+        return pesoArticulo != null ? pesoArticulo : 0.0;
     }
 
     public void setPeso(Double pesoArticulo) {
@@ -206,7 +206,7 @@ public class Articulo {
     }
 
     public double getAlto() {
-        return altoArticulo;
+        return altoArticulo != null ? altoArticulo : 0.0;
     }
 
     public void setAlto(Double altoArticulo) {
@@ -214,7 +214,7 @@ public class Articulo {
     }
 
     public double getAncho() {
-        return anchoArticulo;
+        return anchoArticulo != null ? anchoArticulo : 0.0;
     }
 
     public void setAncho(Double anchoArticulo) {
@@ -222,11 +222,10 @@ public class Articulo {
     }
 
     public double getProfundidad() {
-        return profundidadArticulo;
+        return profundidadArticulo != null ? profundidadArticulo : 0.0;
     }
 
     public void setProfundidad(Double profundidadArticulo) {
         this.profundidadArticulo = profundidadArticulo;
     }
-
 }
