@@ -170,8 +170,7 @@ public class PedidoWebController {
                     }
                     
                     pedidoRepository.save(pedido);
-                    mailService.enviarMailConfirmacionAsync(pedido, false);
-                    System.out.println("Pedido " + idPedido + " PAGADO. (Stock ya fue reservado en checkout). Correo enviado.");
+                    System.out.println("Pedido " + idPedido + " PAGADO. (Stock ya fue reservado en checkout).");
                 }
             });
         }
