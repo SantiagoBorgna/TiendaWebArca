@@ -45,8 +45,8 @@ public class PaymentController {
         respuesta.put("hash", hash);
         // URL de Fiserv (IPG Connect) - Cambiaremos a producción cuando tengas
         // credenciales
-        // URL PRODUCCIÓN: https://www.ipg-online.com/connect/gateway/processing
-        respuesta.put("urlFiserv", "https://www.ipg-online.com/connect/gateway/processing");
+        // URL PRODUCCIÓN: https://www5.ipg-online.com/connect/gateway/processing
+        respuesta.put("urlFiserv", "https://www5.ipg-online.com/connect/gateway/processing");
 
         // ESPÍA SEGURO PARA LOS LOGS DE RAILWAY
         System.out.println("===== DEBUG PAGO =====");

@@ -121,7 +121,7 @@ public class PedidoWebController {
             respuesta.put("txndatetime", fechaHora);
             respuesta.put("chargetotal", montoFormateado);
             respuesta.put("hashExtended", hash);
-            respuesta.put("urlFiserv", "https://www.ipg-online.com/connect/gateway/processing");
+            respuesta.put("urlFiserv", "https://www5.ipg-online.com/connect/gateway/processing");
             respuesta.put("responseSuccessURL", urlExito);
             respuesta.put("responseFailURL", urlFallo);
             respuesta.put("hash_algorithm", "HMACSHA256");
